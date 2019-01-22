@@ -13,7 +13,7 @@ namespace BIMSWebAPI.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201901221119471_BIMS-Migration"; }
+            get { return "201901221401392_BIMS-Migration"; }
         }
         
         string IMigrationMetadata.Source

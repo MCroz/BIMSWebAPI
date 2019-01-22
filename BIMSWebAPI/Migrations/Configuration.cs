@@ -26,6 +26,11 @@ namespace BIMSWebAPI.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+
+
+            context.Users.AddOrUpdate(
+              new Models.User { FirstName = "Aljon", MiddleName = "Agsangre", LastName = "Alacapa", Role = "Administrator", Username = "admin", Password = "admin", CreatedBy = 1, ModifiedBy = 1 }
+            );
         }
     }
 }

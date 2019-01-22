@@ -4,6 +4,7 @@ using System.Data;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace BIMSWebAPI.Controllers
 {
@@ -22,25 +23,26 @@ namespace BIMSWebAPI.Controllers
                     message = "Please Fill All The Fields."
                 });
             }
-            BIMSDb db = new BIMSDb();
-            db.QuickBind(new string[] { model.username, model.password });
-            DataTable dT = db.Select("SELECT * from users where username = @1 AND password = @2");
-            if (dT.Rows.Count == 0)
+            User user;
+            using (var context = new BimsContext())
+            {
+                user = context.Users.Where( b => b.Username == model.username && b.Password == model.password).FirstOrDefault();
+            }
+
+            if (user != null)
             {
                 return Ok(new ResponseModel()
                 {
-                    status = ResponseStatus.Fail,
-                    message = "Invalid Username/Password Combination"
+                    status = ResponseStatus.Success,
+                    message = "Successfully Logged-In",
+                    data = user
                 });
             }
-            string output = JsonConvert.SerializeObject(dT);
-            dT.Dispose();
-            db.CloseConnection();
+
             return Ok(new ResponseModel()
             {
-                status = ResponseStatus.Success,
-                message = "Successfully Logged-In",
-                data = JsonConvert.DeserializeObject(output)
+                status = ResponseStatus.Fail,
+                message = "Invalid Username/Password Combination"
             });
         }
     }

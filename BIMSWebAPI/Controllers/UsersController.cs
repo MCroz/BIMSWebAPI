@@ -35,17 +35,13 @@ namespace BIMSWebAPI.Controllers
         [HttpPost]
         public async Task<IHttpActionResult> AddUser(Models.User user)
         {
-            //BIMSDb db = new BIMSDb();
-            //db.QuickBind(new string[] { model.fname, model.lname, model.mname, model.username, model.password, model.role, model.updated_by, model.updated_by });
-            //db.NonQuery("INSERT into users (fname,lname,mname,username,password,role,created_by,updated_by,date_created) VALUES (@1,@2,@3,@4,@5,@6,@7,@8,Current_Timestamp)");
-            List<Models.User> users = new List<Models.User>();
-            //db.CloseConnection();
+            Models.User exist;
             ResponseStatus thisStatus;
             using (var context = new BimsContext())
             {
                 //Check if username already exist
-                users = context.Users.Where(b => b.Username == user.Username).ToList();
-                if (users.Count > 0)
+                exist = context.Users.Where(b => b.Username == user.Username).FirstOrDefault();
+                if (exist != null)
                 {
                     thisStatus = ResponseStatus.Fail;
                 }
@@ -53,10 +49,11 @@ namespace BIMSWebAPI.Controllers
                 {
                     thisStatus = ResponseStatus.Success;
                     context.Users.Add(user);
+                    context.SaveChanges();
                 }
             }
 
-            if (thisStatus == ResponseStatus.Success)
+            if (thisStatus == ResponseStatus.Fail)
             {
                 return Ok(new ResponseModel()
                 {
@@ -72,8 +69,6 @@ namespace BIMSWebAPI.Controllers
                     message = "Successfully Added"
                 });
             }
-
-
         }
 
         [AllowAnonymous]
@@ -81,47 +76,108 @@ namespace BIMSWebAPI.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> DeleteUser(int id)
         {
-            BIMSDb db = new BIMSDb();
-            db.bind("1", id.ToString());
-            int isSuccess = db.NonQuery("DELETE from users where id = @1");
-            if (isSuccess > 0) {
-                db.CloseConnection();
-                return Ok(new ResponseModel()
+            string message;
+            ResponseStatus resp;
+            using (var context = new BimsContext())
+            {
+                var user = context.Users.Find(id);
+                if (user == null)
                 {
-                    status = ResponseStatus.Success,
-                    message = "Successfully Deleted"
-                });
+                    message = "No User Found";
+                    resp = ResponseStatus.Fail;
+                }
+                else
+                {
+                    context.Users.Remove(user);
+                    context.SaveChanges();
+                    message = "Successfully Removed";
+                    resp = ResponseStatus.Success;
+                }
             }
-
-            db.CloseConnection();
             return Ok(new ResponseModel()
             {
-                status = ResponseStatus.Fail,
-                message = "Deletion Failed"
+                status = resp,
+                message = message
             });
         }
 
         [AllowAnonymous]
-        [Route("api/Users/Test")]
+        [Route("api/Users/GetUserInfo/{id}")]
         [HttpGet]
-        public async Task<IHttpActionResult> Test()
+        public async Task<IHttpActionResult> GetUserInfo(int id)
         {
+            string message;
+            ResponseStatus resp;
+            Models.User user;
             using (var context = new BimsContext())
             {
-                User user = new Models.User();
-                user.FirstName = "Test 1";
-                user.ModifiedBy = "Test 1";
-                user.MiddleName = "Test 1";
-                var std = context.Users.Add(user);
-                context.SaveChanges();
+                user = context.Users.Find(id);
+                if (user == null)
+                {
+                    message = "No User Found";
+                    resp = ResponseStatus.Fail;
+                }
+                else
+                {
+                    message = "Successfully Removed";
+                    resp = ResponseStatus.Success;
+                }
             }
-
-
             return Ok(new ResponseModel()
             {
-                status = ResponseStatus.Fail,
-                message = "Deletion Failed"
+                status = resp,
+                message = message,
+                data = user
             });
+        }
+
+        [AllowAnonymous]
+        [Route("api/Users/UpdateUser")]
+        [HttpPost]
+        public async Task<IHttpActionResult> UpdateUser(Models.User user)
+        {
+            Models.User exist;
+            ResponseStatus thisStatus;
+            using (var context = new BimsContext())
+            {
+                //Check if username already exist
+                exist = context.Users.Where(b => b.Username == user.Username && b.ID != user.ID).FirstOrDefault();
+                if (exist != null)
+                {
+                    thisStatus = ResponseStatus.Fail;
+                }
+                else
+                {
+                    var selectedUser = context.Users.Find(user.ID);
+                    selectedUser.FirstName = user.FirstName;
+                    selectedUser.MiddleName = user.MiddleName;
+                    selectedUser.LastName = user.LastName;
+                    selectedUser.Role = user.Role;
+                    selectedUser.Username = user.Username;
+                    selectedUser.Password = user.Password;
+                    selectedUser.ModifiedBy = user.ModifiedBy;
+
+                    thisStatus = ResponseStatus.Success;
+                    context.SaveChanges();
+                }
+            }
+
+            if (thisStatus == ResponseStatus.Fail)
+            {
+                return Ok(new ResponseModel()
+                {
+                    status = thisStatus,
+                    message = "Username Already Exist"
+                });
+            }
+            else
+            {
+                return Ok(new ResponseModel()
+                {
+                    status = thisStatus,
+                    message = "Successfully Updated"
+                });
+            }
         }
     }
 }
