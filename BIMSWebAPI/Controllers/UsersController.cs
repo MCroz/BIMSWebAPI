@@ -4,6 +4,8 @@ using System.Data;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BIMSWebAPI.Controllers
 {
@@ -14,38 +16,64 @@ namespace BIMSWebAPI.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> GetUserList()
         {
-            BIMSDb db = new BIMSDb();
-            DataTable dT = db.Select("SELECT * from users");
-            Object output = (Object)dT.Rows;
+            List<Models.User> users = new List<Models.User>();
+            using (var context = new BimsContext())
+            {
+                users = context.Users.ToList();
+            }
 
-
-            string JSONString = string.Empty;
-            JSONString = JsonConvert.SerializeObject(dT);
-            dT.Dispose();
-            db.CloseConnection();
             return Ok(new ResponseModel()
             {
                 status = ResponseStatus.Success,
                 message = "Successfully Fetched",
-                data = JsonConvert.DeserializeObject(JSONString)
+                data = users
             });
         }
 
         [AllowAnonymous]
         [Route("api/Users/AddUser")]
         [HttpPost]
-        public async Task<IHttpActionResult> AddUser(UserModel model)
+        public async Task<IHttpActionResult> AddUser(Models.User user)
         {
-            BIMSDb db = new BIMSDb();
-            db.QuickBind(new string[] { model.fname, model.lname, model.mname, model.username, model.password, model.role, model.updated_by, model.updated_by });
-            db.NonQuery("INSERT into users (fname,lname,mname,username,password,role,created_by,updated_by,date_created) VALUES (@1,@2,@3,@4,@5,@6,@7,@8,Current_Timestamp)");
-
-            db.CloseConnection();
-            return Ok(new ResponseModel()
+            //BIMSDb db = new BIMSDb();
+            //db.QuickBind(new string[] { model.fname, model.lname, model.mname, model.username, model.password, model.role, model.updated_by, model.updated_by });
+            //db.NonQuery("INSERT into users (fname,lname,mname,username,password,role,created_by,updated_by,date_created) VALUES (@1,@2,@3,@4,@5,@6,@7,@8,Current_Timestamp)");
+            List<Models.User> users = new List<Models.User>();
+            //db.CloseConnection();
+            ResponseStatus thisStatus;
+            using (var context = new BimsContext())
             {
-                status = ResponseStatus.Success,
-                message = "Successfully Inserted"
-            });
+                //Check if username already exist
+                users = context.Users.Where(b => b.Username == user.Username).ToList();
+                if (users.Count > 0)
+                {
+                    thisStatus = ResponseStatus.Fail;
+                }
+                else
+                {
+                    thisStatus = ResponseStatus.Success;
+                    context.Users.Add(user);
+                }
+            }
+
+            if (thisStatus == ResponseStatus.Success)
+            {
+                return Ok(new ResponseModel()
+                {
+                    status = thisStatus,
+                    message = "Username Already Exist"
+                });
+            }
+            else
+            {
+                return Ok(new ResponseModel()
+                {
+                    status = thisStatus,
+                    message = "Successfully Added"
+                });
+            }
+
+
         }
 
         [AllowAnonymous]
@@ -66,6 +94,29 @@ namespace BIMSWebAPI.Controllers
             }
 
             db.CloseConnection();
+            return Ok(new ResponseModel()
+            {
+                status = ResponseStatus.Fail,
+                message = "Deletion Failed"
+            });
+        }
+
+        [AllowAnonymous]
+        [Route("api/Users/Test")]
+        [HttpGet]
+        public async Task<IHttpActionResult> Test()
+        {
+            using (var context = new BimsContext())
+            {
+                User user = new Models.User();
+                user.FirstName = "Test 1";
+                user.ModifiedBy = "Test 1";
+                user.MiddleName = "Test 1";
+                var std = context.Users.Add(user);
+                context.SaveChanges();
+            }
+
+
             return Ok(new ResponseModel()
             {
                 status = ResponseStatus.Fail,
