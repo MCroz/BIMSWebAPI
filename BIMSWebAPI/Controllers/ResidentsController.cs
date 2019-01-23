@@ -113,28 +113,39 @@ namespace BIMSWebAPI.Controllers
         public async Task<IHttpActionResult> UpdateResident(Resident resident)
         {
             ResponseStatus thisStatus;
+            string message;
             using (var context = new BimsContext())
             {
                 Resident selectedResident = context.Residents.Find(resident.ID);
-                selectedResident.FirstName = resident.FirstName;
-                selectedResident.MiddleName = resident.MiddleName;
-                selectedResident.LastName = resident.LastName;
-                selectedResident.Gender = resident.Gender;
-                selectedResident.CivilStatus = resident.CivilStatus;
-                selectedResident.BirthDate = resident.BirthDate;
-                selectedResident.AddressNo = resident.AddressNo;
-                selectedResident.AddressSt = resident.AddressSt;
-                selectedResident.AddressZone = resident.AddressZone;
-                selectedResident.BirthPlace = resident.BirthPlace;
-                selectedResident.Citizenship = resident.Citizenship;
-                selectedResident.ModifiedBy = resident.ModifiedBy;
-                context.SaveChanges();
+                if (selectedResident != null)
+                {
+                    selectedResident.FirstName = resident.FirstName;
+                    selectedResident.MiddleName = resident.MiddleName;
+                    selectedResident.LastName = resident.LastName;
+                    selectedResident.Gender = resident.Gender;
+                    selectedResident.CivilStatus = resident.CivilStatus;
+                    selectedResident.BirthDate = resident.BirthDate;
+                    selectedResident.AddressNo = resident.AddressNo;
+                    selectedResident.AddressSt = resident.AddressSt;
+                    selectedResident.AddressZone = resident.AddressZone;
+                    selectedResident.BirthPlace = resident.BirthPlace;
+                    selectedResident.Citizenship = resident.Citizenship;
+                    selectedResident.ModifiedBy = resident.ModifiedBy;
+                    context.SaveChanges();
+                    message = "Successfully Updated";
+                    thisStatus = ResponseStatus.Success;
+                }
+                else
+                {
+                    thisStatus = ResponseStatus.Fail;
+                    message = "No Resident Found";
+                }
             }
 
             return Ok(new ResponseModel()
             {
-                status = ResponseStatus.Success,
-                message = "Successfully Updated"
+                status = thisStatus,
+                message = message
             });
         }
     }
