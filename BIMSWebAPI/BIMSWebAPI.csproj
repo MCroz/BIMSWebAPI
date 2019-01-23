@@ -203,6 +203,7 @@
     <Compile Include="BIMSDb.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\ResidentsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -211,10 +212,19 @@
     <Compile Include="Migrations\201901221401392_BIMS-Migration.Designer.cs">
       <DependentUpon>201901221401392_BIMS-Migration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201901231443405_AddedResident.cs" />
+    <Compile Include="Migrations\201901231443405_AddedResident.Designer.cs">
+      <DependentUpon>201901231443405_AddedResident.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901231444487_AddedResidents.cs" />
+    <Compile Include="Migrations\201901231444487_AddedResidents.Designer.cs">
+      <DependentUpon>201901231444487_AddedResidents.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\BaseEntity.cs" />
     <Compile Include="Models\BimsContext.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\Resident.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -284,6 +294,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201901221401392_BIMS-Migration.resx">
       <DependentUpon>201901221401392_BIMS-Migration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231443405_AddedResident.resx">
+      <DependentUpon>201901231443405_AddedResident.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901231444487_AddedResidents.resx">
+      <DependentUpon>201901231444487_AddedResidents.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

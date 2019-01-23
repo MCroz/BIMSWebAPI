@@ -15,6 +15,7 @@ namespace BIMSWebAPI.Models
 
         //Add your Dbsets here
         public DbSet<User> Users { get; set; }
+        public DbSet<Resident> Residents { get; set; }
 
 
         //Reference the name of your connection string
@@ -44,11 +45,13 @@ namespace BIMSWebAPI.Models
             {
                 if (entity.State == EntityState.Added)
                 {
-                    ((BaseEntity)entity.Entity).DateCreated = DateTime.UtcNow;
+                    //((BaseEntity)entity.Entity).DateCreated = DateTime.UtcNow;
+                    ((BaseEntity)entity.Entity).DateCreated = DateTime.Now;
                     //((BaseEntity)entity.Entity).CreatedBy = currentUsername;
                 }
 
-                ((BaseEntity)entity.Entity).DateModified = DateTime.UtcNow;
+                //((BaseEntity)entity.Entity).DateModified = DateTime.UtcNow;
+                ((BaseEntity)entity.Entity).DateModified = DateTime.Now;
                 //((BaseEntity)entity.Entity).ModifiedBy = currentUsername;
             }
         }
