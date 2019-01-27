@@ -16,6 +16,9 @@ namespace BIMSWebAPI.Models
         //Add your Dbsets here
         public DbSet<User> Users { get; set; }
         public DbSet<Resident> Residents { get; set; }
+        public DbSet<Medicine> Medicines { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
+        public DbSet<InventoryMovement> InventoryMovement { get; set; }
 
 
         //Reference the name of your connection string

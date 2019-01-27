@@ -42,7 +42,7 @@ namespace BIMSWebAPI
 
             MySQLServerHost = "localhost";
             MySQLPort = "3306";
-            MySQLDatabase = "bims";
+            MySQLDatabase = "bimsdb";
             MySQLUsername = "root";
             MySQLPassword = "";
 
