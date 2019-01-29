@@ -19,7 +19,7 @@ namespace BIMSWebAPI.Controllers
         {
             BIMSDb db = new BIMSDb();
             //db.Select("SELECT m.MedicineName as 'Medicine Name', m.Description as 'Description', ");
-            DataTable dt = db.Select("SELECT m.ID as 'ID' ,m.MedicineName as 'Medicine Name', m.Description as 'Description',COALESCE(SUM(im.Quantity),0) as 'Stock On Hand' FROM inventorymovements im LEFT JOIN stocks s ON s.ID = im.StockID INNER JOIN medicines m ON s.MedicineID = m.ID GROUP BY m.ID");
+            DataTable dt = db.Select("SELECT m.ID as 'ID' ,m.MedicineName as 'Medicine Name', m.Description as 'Description',COALESCE(SUM(im.Quantity),0) as 'Stock On Hand' FROM inventorymovements im INNER JOIN stocks s ON s.ID = im.StockID LEFT JOIN medicines m ON s.MedicineID = m.ID GROUP BY m.ID");
 
             //List<DataRow> rows = dt.Rows.Cast<DataRow>().ToList();
             var tempData = (from DataRow row in dt.Rows
@@ -33,6 +33,8 @@ namespace BIMSWebAPI.Controllers
 
             dt.Dispose();
             db.CloseConnection();
+
+
             return Ok(new ResponseModel()
             {
                 status = ResponseStatus.Success,
@@ -59,10 +61,10 @@ namespace BIMSWebAPI.Controllers
                 }
                 else
                 {
-                    Stock newStock = new Models.Stock { ModifiedBy = model.ModifiedBy, CreatedBy = model.CreatedBy, MedicineID = model.MedicineID, ExpirationDate = model.ExpirationDate };
+                    Stock newStock = new Models.Stock { ModifiedBy = model.ModifiedBy, CreatedBy = model.CreatedBy, MedicineID = model.MedicineID, ExpirationDate = model.ExpirationDate, Medicine = medicine };
                     context.Stocks.Add(newStock);
                     context.SaveChanges();
-                    InventoryMovement im = new InventoryMovement { Quantity = model.Quantity, ModifiedBy = model.ModifiedBy, CreatedBy = model.CreatedBy, StockID = newStock.ID};
+                    InventoryMovement im = new InventoryMovement { Quantity = model.Quantity, ModifiedBy = model.ModifiedBy, CreatedBy = model.CreatedBy, StockID = newStock.ID, Stock = newStock};
                     context.InventoryMovement.Add(im);
                     context.SaveChanges();
                 }

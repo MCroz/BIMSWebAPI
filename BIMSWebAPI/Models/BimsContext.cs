@@ -19,6 +19,7 @@ namespace BIMSWebAPI.Models
         public DbSet<Medicine> Medicines { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<InventoryMovement> InventoryMovement { get; set; }
+        public DbSet<DispenseTransaction> DispenseTransactions { get; set; }
 
 
         //Reference the name of your connection string

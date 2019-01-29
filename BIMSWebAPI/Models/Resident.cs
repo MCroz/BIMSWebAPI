@@ -22,5 +22,7 @@ namespace BIMSWebAPI.Models
         public string AddressZone { get; set; }
         public string BirthPlace { get; set; }
         public string Citizenship { get; set; }
+
+        public string Image { get; set; }
     }
 }
