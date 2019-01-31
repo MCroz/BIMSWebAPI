@@ -165,8 +165,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Images\" />
+    <Folder Include="App_Data\Images\" />
+    <Folder Include="Images\ResidentImages\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -208,6 +208,7 @@
     <Compile Include="Controllers\MedicinesController.cs" />
     <Compile Include="Controllers\ResidentsController.cs" />
     <Compile Include="Controllers\StocksController.cs" />
+    <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
