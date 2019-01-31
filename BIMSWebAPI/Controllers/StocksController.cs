@@ -76,6 +76,35 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
+        [AllowAnonymous]
+        [Route("api/Stocks/GetMedicineStocks/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetMedicineStocks(int id)
+        {
+            using (BimsContext context = new BimsContext())
+            {
+                var res = (from im in context.InventoryMovement
+                           join stock in context.Stocks on im.StockID equals stock.ID
+                           join medicine in context.Medicines on stock.MedicineID equals medicine.ID
+                           where medicine.ID == id
+                           group im by new { medicine.MedicineName, stock.ID, medicine.Description, stock.ExpirationDate } into g
+                           select new
+                           {
+                               MedicineName = g.Key.MedicineName,
+                               Description = g.Key.Description,
+                               Total = g.Sum(test => test.Quantity),
+                               ExpirationDate = g.Key.ExpirationDate,
+                               StockID = g.Key.ID
+                           }).ToList();
+                return Ok(new ResponseModel()
+                {
+                    status = ResponseStatus.Success,
+                    message = "Successfully Fetched",
+                    data = res
+                });
+            }
+        }
+
         public class AddStockClass : BaseEntity {
             public int MedicineID { get; set; }
             public int Quantity { get; set; }

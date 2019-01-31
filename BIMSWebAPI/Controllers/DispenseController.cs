@@ -51,22 +51,33 @@ namespace BIMSWebAPI.Controllers
         {
             using (var context = new BimsContext())
             {
-                
-
-                return Ok(new ResponseModel()
+                var resident = context.Residents.Find(model.ResidentID);
+                DispenseTransaction dispense = new DispenseTransaction { Resident = resident, ResidentID = resident.ID, PrescriptionDescription = model.PrescriptionDescription, CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy };
+                context.DispenseTransactions.Add(dispense);
+                context.SaveChanges();
+                foreach (CustomDispenseMedicineItem itm in model.Items)
                 {
-                    status = ResponseStatus.Success,
-                    message = "Successfully Added",
-                    data = model
-                });
+                    int qty = -1 * itm.Quantity;
+                    var stock = context.Stocks.Find(itm.StockID);
+                    InventoryMovement im = new InventoryMovement { CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy, StockID = itm.StockID, Quantity =  qty, DispenseTransactionID = dispense.ID, DispenseTransaction = dispense, Stock = stock};
+                    context.InventoryMovement.Add(im);
+                    dispense.InventoryMovement.Add(im);
+                }
+                context.SaveChanges();
             }
-
+            return Ok(new ResponseModel()
+            {
+                status = ResponseStatus.Success,
+                message = "Successfully Added"
+            });
         }
 
         public class CustomDispenseData {
             public int ResidentID { get; set; }
             public List<CustomDispenseMedicineItem> Items { get; set; }
             public string PrescriptionDescription { get; set; }
+            public int CreatedBy { get; set; }
+            public int ModifiedBy { get; set; }
         }
 
         public class CustomDispenseMedicineItem {

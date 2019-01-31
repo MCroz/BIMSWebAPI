@@ -148,5 +148,50 @@ namespace BIMSWebAPI.Controllers
                 message = message
             });
         }
+
+        [AllowAnonymous]
+        [Route("api/Residents/SearchResident")]
+        [HttpPost]
+        public async Task<IHttpActionResult> SearchResident(SearchModel search)
+        {
+            using (var context = new BimsContext())
+            {
+                List<Resident> query;
+                if (search.FilterType == "Zone")
+                {
+                    query = (from r in context.Residents
+                             where r.AddressZone.Contains(search.SearchString)
+                             select r).ToList();
+                }
+                else if (search.FilterType == "Name")
+                {
+                    query = (from r in context.Residents
+                             where r.MiddleName.Contains(search.SearchString) || r.LastName.Contains(search.SearchString)
+                             || r.FirstName.Contains(search.SearchString)
+                             select r).ToList();
+                }
+                else
+                {
+                    query = (from r in context.Residents
+                             where r.MiddleName.Contains(search.SearchString) || r.LastName.Contains(search.SearchString)
+                             || r.FirstName.Contains(search.SearchString) || r.AddressZone.Contains(search.SearchString)
+                             select r).ToList();
+                }
+
+
+                return Ok(new ResponseModel()
+                {
+                    status = ResponseStatus.Success,
+                    message = "Successfully Added",
+                    data = query
+                });
+            }
+
+        }
+
+        public class SearchModel {
+            public string SearchString { get; set; }
+            public string FilterType { get; set; }
+        }
     }
 }
