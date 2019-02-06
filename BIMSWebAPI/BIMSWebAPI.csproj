@@ -216,6 +216,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201902061036190_ReInitialize.cs" />
+    <Compile Include="Migrations\201902061036190_ReInitialize.Designer.cs">
+      <DependentUpon>201902061036190_ReInitialize.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\BarangayClearanceTransaction.cs" />
     <Compile Include="Models\BaseEntity.cs" />
@@ -294,6 +298,11 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201902061036190_ReInitialize.resx">
+      <DependentUpon>201902061036190_ReInitialize.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -180,5 +180,163 @@ namespace BIMSWebAPI.Controllers
                 });
             }
         }
+
+
+        [AllowAnonymous]
+        [Route("api/Users/ResetPassword/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ResetPassword(int id)
+        {
+            string message;
+            ResponseStatus resp;
+            using (var context = new BimsContext())
+            {
+                var user = context.Users.Find(id);
+                if (user == null)
+                {
+                    message = "No User Found";
+                    resp = ResponseStatus.Fail;
+                }
+                else
+                {
+                    //context.Users.Remove(user);
+                    user.Password = "1234";
+                    context.SaveChanges();
+                    message = "Password Reset is Successfully. New Password is '1234'";
+                    resp = ResponseStatus.Success;
+                }
+            }
+            return Ok(new ResponseModel()
+            {
+                status = resp,
+                message = message
+            });
+        }
+
+        [AllowAnonymous]
+        [Route("api/Users/UnblockUser/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> UnblockUser(int id)
+        {
+            string message;
+            ResponseStatus resp;
+            using (var context = new BimsContext())
+            {
+                var user = context.Users.Find(id);
+                if (user == null)
+                {
+                    message = "No User Found";
+                    resp = ResponseStatus.Fail;
+                }
+                else
+                {
+                    user.Attempt = 0;
+                    context.SaveChanges();
+                    message = "Successfully Unblocked the User.";
+                    resp = ResponseStatus.Success;
+                }
+            }
+            return Ok(new ResponseModel()
+            {
+                status = resp,
+                message = message
+            });
+        }
+
+        [AllowAnonymous]
+        [Route("api/Users/ForgotPassword")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ForgotPassword(ForgotPasswordModel model)
+        {
+            string message;
+            ResponseStatus resp;
+            using (var context = new BimsContext())
+            {
+                var user = context.Users.Where(u => u.Username == model.Username).FirstOrDefault();
+                if (user == null)
+                {
+                    message = "No Matching Username Found";
+                    resp = ResponseStatus.Fail;
+                }
+                else
+                {
+                    if (user.SecretQuestion1ID == model.SecretQuestion1 && user.SecretQuestion2ID == model.SecretQuestion2 && user.SecretAnswer1 == model.SecretAnswer1 && user.SecretAnswer2 == model.SecretAnswer2)
+                    {
+                        user.Password = "1234";
+                        context.SaveChanges();
+                        message = "Password Reset Successful. Your New Password is '1234'";
+                        resp = ResponseStatus.Success;
+                    }
+                    else
+                    {
+                        message = "Invalid Secret Answer/Secret Question Combination.";
+                        resp = ResponseStatus.Fail;
+                    }
+                }
+            }
+            return Ok(new ResponseModel()
+            {
+                status = resp,
+                message = message
+            });
+        }
+
+        [AllowAnonymous]
+        [Route("api/Users/FirstTimeLogin")]
+        [HttpPost]
+        public async Task<IHttpActionResult> FirstTimeLogin(FirstTimeLoginModel model)
+        {
+            string message;
+            ResponseStatus resp;
+            using (var context = new BimsContext())
+            {
+                var user = await context.Users.FindAsync(model.UserID);
+                if (user == null)
+                {
+                    message = "No User Found";
+                    resp = ResponseStatus.Fail;
+                }
+                else
+                {
+                    user.ModifiedBy = model.UserID;
+                    user.SecretAnswer1 = model.SecretAnswer1;
+                    user.SecretAnswer2 = model.SecretAnswer2;
+                    user.SecretQuestion1ID = model.SecretQuestion1;
+                    user.SecretQuestion2ID = model.SecretQuestion2;
+                    user.Password = model.Password;
+                    context.SaveChanges();
+
+                    message = "Successfully Updated.";
+                    resp = ResponseStatus.Success;
+                }
+            }
+            return Ok(new ResponseModel()
+            {
+                status = resp,
+                message = message
+            });
+        }
+    }
+
+
+
+    public class FirstTimeLoginModel
+    {
+        public int UserID { get; set; }
+        public int SecretQuestion1 { get; set; }
+        public string SecretAnswer1 { get; set; }
+        public int SecretQuestion2 { get; set; }
+        public string SecretAnswer2 { get; set; }
+        public string Password { get; set; }
+    }
+
+
+    public class ForgotPasswordModel
+    {
+        public string Username { get; set; }
+        public int SecretQuestion1 { get; set; }
+        public string SecretAnswer1 { get; set; }
+        public int SecretQuestion2 { get; set; }
+        public string SecretAnswer2 { get; set; }
     }
 }
