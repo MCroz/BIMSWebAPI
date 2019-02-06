@@ -23,26 +23,59 @@ namespace BIMSWebAPI.Controllers
                     message = "Please Fill All The Fields."
                 });
             }
-            User user;
+            
             using (var context = new BimsContext())
             {
-                user = context.Users.Where( b => b.Username == model.username && b.Password == model.password).FirstOrDefault();
+                User user;
+                user = context.Users.Where( b => b.Username == model.username).FirstOrDefault();
+
+                if (user != null)
+                {
+                    if (user.Attempt >= 4)
+                    {
+                        return Ok(new ResponseModel()
+                        {
+                            status = ResponseStatus.Fail,
+                            message = "This Account Reached the Maximum Number of Attempt to Log-In. This Account is now Blocked."
+                        });
+                    }
+
+                    if (user.Password != model.password)
+                    {
+                        user.Attempt += 1;
+                        context.SaveChanges();
+                        if (user.Attempt >= 4)
+                        {
+                            return Ok(new ResponseModel()
+                            {
+                                status = ResponseStatus.Fail,
+                                message = "Incorrect Password. This Account Reached the Maximum Number of Attempt to Log-In. This Account is now Blocked."
+                            });
+                        }
+                        return Ok(new ResponseModel()
+                        {
+                            status = ResponseStatus.Fail,
+                            message = "Incorrect Password"
+                        });
+                    }
+
+                    user.Attempt = 0;
+                    context.SaveChanges();
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Success,
+                        message = "Successfully Logged-In",
+                        data = user
+                    });
+                }
             }
 
-            if (user != null)
-            {
-                return Ok(new ResponseModel()
-                {
-                    status = ResponseStatus.Success,
-                    message = "Successfully Logged-In",
-                    data = user
-                });
-            }
+
 
             return Ok(new ResponseModel()
             {
                 status = ResponseStatus.Fail,
-                message = "Invalid Username/Password Combination"
+                message = "No Account Match for the Entered Username"
             });
         }
     }

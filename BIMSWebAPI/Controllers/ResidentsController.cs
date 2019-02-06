@@ -1,11 +1,9 @@
 ﻿using BIMSWebAPI.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using BIMSWebAPI.App_Code;
 
 namespace BIMSWebAPI.Controllers
 {
@@ -131,6 +129,10 @@ namespace BIMSWebAPI.Controllers
                     selectedResident.BirthPlace = resident.BirthPlace;
                     selectedResident.Citizenship = resident.Citizenship;
                     selectedResident.ModifiedBy = resident.ModifiedBy;
+                    selectedResident.Image = resident.Image;
+
+                    //AuditLogHelper.GenerateUpdateLog(context, resident.ModifiedBy);
+
                     context.SaveChanges();
                     message = "Successfully Updated";
                     thisStatus = ResponseStatus.Success;

@@ -96,6 +96,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -169,6 +170,7 @@
     <Folder Include="Images\ResidentImages\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Code\AuditLogHelper.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -206,6 +208,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\MedicinesController.cs" />
+    <Compile Include="Controllers\PrintController.cs" />
     <Compile Include="Controllers\ResidentsController.cs" />
     <Compile Include="Controllers\StocksController.cs" />
     <Compile Include="Controllers\UploadController.cs" />
@@ -213,20 +216,20 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201901291157451_ReInitialize.cs" />
-    <Compile Include="Migrations\201901291157451_ReInitialize.Designer.cs">
-      <DependentUpon>201901291157451_ReInitialize.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\BarangayClearanceTransaction.cs" />
     <Compile Include="Models\BaseEntity.cs" />
     <Compile Include="Models\BimsContext.cs" />
     <Compile Include="Models\DispenseTransaction.cs" />
+    <Compile Include="Models\IndigencyTransaction.cs" />
     <Compile Include="Models\InventoryMovement.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\Medicine.cs" />
     <Compile Include="Models\Resident.cs" />
+    <Compile Include="Models\SecretQuestion.cs" />
     <Compile Include="Models\Stock.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -291,11 +294,6 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201901291157451_ReInitialize.resx">
-      <DependentUpon>201901291157451_ReInitialize.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -31,6 +31,15 @@ namespace BIMSWebAPI.Migrations
             context.Users.AddOrUpdate(
               new Models.User { FirstName = "Aljon", MiddleName = "Agsangre", LastName = "Alacapa", Role = "Administrator", Username = "admin", Password = "admin", CreatedBy = 1, ModifiedBy = 1 }
             );
+
+            context.SecretQuestions.AddOrUpdate(
+                new Models.SecretQuestion { Question = "What was your childhood nickname?" },
+                new Models.SecretQuestion { Question = "What is the name of your favorite childhood friend?" },
+                new Models.SecretQuestion { Question = "In what city or town did your mother and father meet?" },
+                new Models.SecretQuestion { Question = "What is the middle name of your oldest child?" },
+                new Models.SecretQuestion { Question = "What is the first name of the boy or girl that you first kissed?" },
+                new Models.SecretQuestion { Question = "What was the make and model of your first car?" }
+            );
         }
     }
 }

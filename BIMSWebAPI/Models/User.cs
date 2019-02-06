@@ -15,5 +15,16 @@ namespace BIMSWebAPI.Models
         public string Username { get; set; }
         public string Password { get; set; }
         public string Role { get; set; }
+
+        public int? SecretQuestion1ID { get; set; }
+        public SecretQuestion SecretQuestion1 { get; set; }
+
+        public int? SecretQuestion2ID { get; set; }
+        public SecretQuestion SecretQuestion2 { get; set; }
+
+        public string SecretAnswer1 { get; set; }
+        public string SecretAnswer2 { get; set; }
+
+        public int Attempt { get; set; }
     }
 }

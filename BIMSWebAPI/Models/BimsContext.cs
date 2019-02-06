@@ -10,7 +10,7 @@ namespace BIMSWebAPI.Models
 {
     // Code-Based Configuration and Dependency resolution
     [DbConfigurationType(typeof(MySqlEFConfiguration))]
-    class BimsContext : DbContext
+    public class BimsContext : DbContext
     {
 
         //Add your Dbsets here
@@ -20,11 +20,15 @@ namespace BIMSWebAPI.Models
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<InventoryMovement> InventoryMovement { get; set; }
         public DbSet<DispenseTransaction> DispenseTransactions { get; set; }
+        public DbSet<SecretQuestion> SecretQuestions { get; set; }
+        public DbSet<IndigencyTransaction> IndigencyTransactions { get; set; }
+        public DbSet<BarangayClearanceTransaction> BarangayClearanceTransactions { get; set; }
 
 
         //Reference the name of your connection string
         public BimsContext() : base("BIMSDb")
         {
+
         }
 
         public override int SaveChanges()

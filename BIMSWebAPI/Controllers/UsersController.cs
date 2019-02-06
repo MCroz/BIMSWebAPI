@@ -48,6 +48,7 @@ namespace BIMSWebAPI.Controllers
                 else
                 {
                     thisStatus = ResponseStatus.Success;
+                    user.Attempt = 0;
                     context.Users.Add(user);
                     context.SaveChanges();
                 }
