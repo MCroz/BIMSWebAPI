@@ -155,7 +155,6 @@ namespace BIMSWebAPI.Controllers
                     selectedUser.LastName = user.LastName;
                     selectedUser.Role = user.Role;
                     selectedUser.Username = user.Username;
-                    selectedUser.Password = user.Password;
                     selectedUser.ModifiedBy = user.ModifiedBy;
 
                     thisStatus = ResponseStatus.Success;

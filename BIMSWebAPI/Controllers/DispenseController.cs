@@ -72,6 +72,49 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
+        [AllowAnonymous]
+        [Route("api/Dispense/ListDispenseTransaction/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ListDispenseTransaction(int id)
+        {
+            using (var context = new BimsContext())
+            {
+                var resident = context.Residents.Find(id);
+                if (resident == null)
+                {
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Fail,
+                        message = "No User Found"
+                    });
+                }
+                else
+                {
+                    //Get All Dispense Transaction
+                    var dispenseTransactions = (from dt in context.DispenseTransactions
+                                                join res in context.Residents on dt.ResidentID equals resident.ID
+                                                join user in context.Users on dt.CreatedBy equals user.ID
+                                                select new {
+                                                    ID = dt.ID,
+                                                    CreatedBy = user.FirstName,
+                                                    PreparationDescription = dt.PrescriptionDescription,
+                                                    DateDispensed = dt.DateCreated
+                                                }).ToList();
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Success,
+                        message = "Successfully Fetched",
+                        data = dispenseTransactions
+                    });
+                }
+            }
+        }
+
+        //public class FetchDispenseData {
+        //    public int ResidentID { get; set; }
+        //}
+
+
         public class CustomDispenseData {
             public int ResidentID { get; set; }
             public List<CustomDispenseMedicineItem> Items { get; set; }

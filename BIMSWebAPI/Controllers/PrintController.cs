@@ -64,7 +64,7 @@ namespace BIMSWebAPI.Controllers
                         int newCount = context.IndigencyTransactions.AsNoTracking().Where(b => b.DateCreated.Value.Year == DateTime.Now.Year).Count();
                         newCount += 1;
                         string controlNo = newCount.ToString().PadLeft(4, '0');
-                        string finalControlNo = controlNo + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-DDL";
+                        string finalControlNo = controlNo + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-CJRT";
                         it = new IndigencyTransaction
                         {
                             ResidentID = printModel.ResidentID,
@@ -88,6 +88,7 @@ namespace BIMSWebAPI.Controllers
                 }
             }
         }
+
 
         public class PrintModel
         {
