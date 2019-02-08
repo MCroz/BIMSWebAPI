@@ -315,9 +315,83 @@ namespace BIMSWebAPI.Controllers
                 message = message
             });
         }
+
+
+        [AllowAnonymous]
+        [Route("api/Users/UpdateUserProfile")]
+        [HttpPost]
+        public async Task<IHttpActionResult> UpdateUserProfile(UpdateUserProfileModel model)
+        {
+            string message;
+            ResponseStatus resp;
+            using (var context = new BimsContext())
+            {
+                var user = await context.Users.FindAsync(model.UserID);
+                if (user == null)
+                {
+                    message = "No User Found";
+                    resp = ResponseStatus.Fail;
+                }
+                else
+                {
+                    user.ModifiedBy = model.UserID;
+                    user.SecretAnswer1 = model.SecretAnswer1;
+                    user.SecretAnswer2 = model.SecretAnswer2;
+                    user.SecretQuestion1ID = model.SecretQuestion1;
+                    user.SecretQuestion2ID = model.SecretQuestion2;
+                    user.FirstName = model.FirstName;
+                    user.MiddleName = model.MiddleName;
+                    user.LastName = model.LastName;
+
+                    if (model.UpdatePassword)
+                    {
+                        if (model.CurrentPassword != user.Password)
+                        {
+                            return Ok(new ResponseModel()
+                            {
+                                status = ResponseStatus.Fail,
+                                message = "Current Password Doesn't Match."
+                            });
+                        }
+                        if (model.CurrentPassword == model.Password)
+                        {
+                            return Ok(new ResponseModel()
+                            {
+                                status = ResponseStatus.Fail,
+                                message = "Current Password and New Password Shouldn't Be Equal."
+                            });
+                        }
+
+                        user.Password = model.Password;
+                    }
+                    context.SaveChanges();
+
+                    message = "Successfully Updated.";
+                    resp = ResponseStatus.Success;
+                }
+            }
+            return Ok(new ResponseModel()
+            {
+                status = resp,
+                message = message
+            });
+        }
     }
 
-
+    public class UpdateUserProfileModel
+    {
+        public int UserID { get; set; }
+        public int SecretQuestion1 { get; set; }
+        public string SecretAnswer1 { get; set; }
+        public int SecretQuestion2 { get; set; }
+        public string SecretAnswer2 { get; set; }
+        public string CurrentPassword { get; set; }
+        public string Password { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public bool UpdatePassword { get; set; }
+    }
 
     public class FirstTimeLoginModel
     {
