@@ -12,6 +12,10 @@ namespace BIMSWebAPI.Models
         public int ResidentID { get; set; }
         public Resident Resident { get; set; }
 
+        public string FullAddress { get; set; }
+        public string FullName { get; set; }
+        public string Image { get; set; }
+
         public string Purpose { get; set; }
 
         public string ControlNo { get; set; }

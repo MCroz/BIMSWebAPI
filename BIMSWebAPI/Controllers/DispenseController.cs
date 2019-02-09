@@ -110,6 +110,48 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [Route("api/Dispense/ListDispenseMedicines/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ListDispenseMedicines(int id)
+        {
+            using (var context = new BimsContext())
+            {
+                var dispenseTransaction = await context.DispenseTransactions.FindAsync(id);
+                if (dispenseTransaction == null)
+                {
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Fail,
+                        message = "No Dispense Transaction Found"
+                    });
+                }
+                else
+                {
+                    //Get All Dispense Transaction Medicines
+                    var dispenseTransactions = (from im in context.InventoryMovement
+                                                join dt in context.DispenseTransactions on im.DispenseTransactionID equals dt.ID
+                                                join s in context.Stocks on im.StockID equals s.ID
+                                                join m in context.Medicines on s.MedicineID equals m.ID
+                                                where im.DispenseTransactionID == id
+                                                select new
+                                                {
+                                                    ID = im.ID,
+                                                    Medicine = m.MedicineName,
+                                                    Description = m.Description,
+                                                    ExpirationDate = s.ExpirationDate,
+                                                    Quantity = im.Quantity * -1
+                                                }).ToList();
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Success,
+                        message = "Successfully Fetched",
+                        data = dispenseTransactions
+                    });
+                }
+            }
+        }
+
         //public class FetchDispenseData {
         //    public int ResidentID { get; set; }
         //}
