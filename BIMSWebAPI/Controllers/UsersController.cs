@@ -6,6 +6,9 @@ using System.Web.Http;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using BIMSWebAPI.App_Code;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace BIMSWebAPI.Controllers
 {
@@ -50,6 +53,25 @@ namespace BIMSWebAPI.Controllers
                     thisStatus = ResponseStatus.Success;
                     user.Attempt = 0;
                     context.Users.Add(user);
+
+                    var currentUser = context.Users.Find(user.ModifiedBy);
+                    string logChanges = "";
+                    foreach (PropertyInfo pi in user.GetType().GetProperties())
+                    {
+                        //pi.GetValue(myClass, null)?.ToString();
+                        if (pi.Name != "ModifiedBy" && pi.Name != "CreatedBy" && pi.Name != "DateModified" && pi.Name != "DateCreated" && pi.Name != "ID")
+                        {
+                            if (logChanges != "")
+                            {
+                                logChanges += ", ";
+                            }
+                            logChanges += pi.GetValue(user, null)?.ToString() != "" ? pi.Name + " = " + pi.GetValue(user, null)?.ToString() : "";
+                        }
+                    }
+                    string changes = currentUser.Username + " Added A User and Set: " + logChanges;
+                    AuditLogHelper.GenerateLog(context, "Create", changes);
+
+
                     context.SaveChanges();
                 }
             }
@@ -158,6 +180,10 @@ namespace BIMSWebAPI.Controllers
                     selectedUser.ModifiedBy = user.ModifiedBy;
 
                     thisStatus = ResponseStatus.Success;
+                    var currentUser = context.Users.Find(user.ModifiedBy);
+                    string changes = currentUser.Username + " Updated User: " + AuditLogHelper.FetchChanges(context);
+                    AuditLogHelper.GenerateLog(context, "Update", changes);
+
                     context.SaveChanges();
                 }
             }
@@ -200,6 +226,7 @@ namespace BIMSWebAPI.Controllers
                 {
                     //context.Users.Remove(user);
                     user.Password = "1234";
+                    AuditLogHelper.GenerateLog(context, "Update", "Reset " + user.Username + " Password");
                     context.SaveChanges();
                     message = "Password Reset is Successfully. New Password is '1234'";
                     resp = ResponseStatus.Success;
@@ -230,6 +257,7 @@ namespace BIMSWebAPI.Controllers
                 else
                 {
                     user.Attempt = 0;
+                    AuditLogHelper.GenerateLog(context, "Update", "Unblock " + user.Username);
                     context.SaveChanges();
                     message = "Successfully Unblocked the User.";
                     resp = ResponseStatus.Success;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
 using System.Linq;
+using BIMSWebAPI.App_Code;
 
 namespace BIMSWebAPI.Controllers
 {
@@ -33,6 +34,7 @@ namespace BIMSWebAPI.Controllers
                 {
                     if (user.Attempt >= 4)
                     {
+                        AuditLogHelper.GenerateLog(context,"Login", model.username + " Logged In To The System. Exceeded Maximum Attempt");
                         return Ok(new ResponseModel()
                         {
                             status = ResponseStatus.Fail,
@@ -42,6 +44,7 @@ namespace BIMSWebAPI.Controllers
 
                     if (user.Password != model.password)
                     {
+                        AuditLogHelper.GenerateLog(context, "Login", model.username + " Logged In, Invalid Password.");
                         user.Attempt += 1;
                         context.SaveChanges();
                         if (user.Attempt >= 4)
@@ -60,6 +63,7 @@ namespace BIMSWebAPI.Controllers
                     }
 
                     user.Attempt = 0;
+                    AuditLogHelper.GenerateLog(context, "Login", model.username + " Logged In Successfully.");
                     context.SaveChanges();
                     return Ok(new ResponseModel()
                     {

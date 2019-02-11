@@ -26,5 +26,7 @@ namespace BIMSWebAPI.Models
         public string SecretAnswer2 { get; set; }
 
         public int Attempt { get; set; }
+
+        public int isRemoved { get; set; }
     }
 }

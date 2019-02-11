@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using BIMSWebAPI.App_Code;
+using System.Reflection;
 
 namespace BIMSWebAPI.Controllers
 {
@@ -36,6 +37,27 @@ namespace BIMSWebAPI.Controllers
             using (var context = new BimsContext())
             {
                 context.Residents.Add(resident);
+
+                //For Logging
+                var currentUser = context.Users.Find(resident.ModifiedBy);
+                string logChanges = "";
+                foreach (PropertyInfo pi in resident.GetType().GetProperties())
+                {
+                    //pi.GetValue(myClass, null)?.ToString();
+                    if (pi.Name != "ModifiedBy" && pi.Name != "CreatedBy" && pi.Name != "DateModified" && pi.Name != "DateCreated" && pi.Name != "ID")
+                    {
+                        if (logChanges != "")
+                        {
+                            logChanges += ", ";
+                        }
+                        logChanges += pi.GetValue(resident, null)?.ToString() != "" ? pi.Name + " = " + pi.GetValue(resident, null)?.ToString() : "";
+                    }
+                }
+                string changes = currentUser.Username + " Added A New Resident and Set: " + logChanges;
+                AuditLogHelper.GenerateLog(context, "Create", changes);
+                //For Logging
+
+
                 context.SaveChanges();
             }
             return Ok(new ResponseModel()
@@ -131,7 +153,9 @@ namespace BIMSWebAPI.Controllers
                     selectedResident.ModifiedBy = resident.ModifiedBy;
                     selectedResident.Image = resident.Image;
 
-                    //AuditLogHelper.GenerateUpdateLog(context, resident.ModifiedBy);
+                    var currentUser = context.Users.Find(selectedResident.ModifiedBy);
+                    string changes = currentUser.Username + " Updated Resident: " + AuditLogHelper.FetchChanges(context);
+                    AuditLogHelper.GenerateLog(context, "Update", changes);
 
                     context.SaveChanges();
                     message = "Successfully Updated";

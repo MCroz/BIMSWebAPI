@@ -35,7 +35,6 @@ namespace BIMSWebAPI.Controllers
                 else
                 {
                     //Create a new Transaction
-                    //User user = context.Users.Find(printModel.ProcessedByID);
                     //Fetch who Create it
                     var processingUser = context.Users.Find(printModel.ProcessedByID);
                     string appendingControlNo = BimsHelper.ExtractInitialsFromName(processingUser.FirstName + " " + processingUser.MiddleName + " " + processingUser.LastName);
@@ -44,7 +43,7 @@ namespace BIMSWebAPI.Controllers
                     {
                         int newCount = context.BarangayClearanceTransactions.AsNoTracking().Where(b => b.DateCreated.Value.Year == DateTime.Now.Year).Count();
                         newCount += 1;
-                        string controlNo = newCount.ToString().PadLeft(4, '0');
+                        string controlNo = newCount.ToString().PadLeft(5, '0');
                         string finalControlNo = controlNo + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
                         bc = new BarangayClearanceTransaction
                         {
@@ -72,7 +71,7 @@ namespace BIMSWebAPI.Controllers
                     {
                         int newCount = context.IndigencyTransactions.AsNoTracking().Where(b => b.DateCreated.Value.Year == DateTime.Now.Year).Count();
                         newCount += 1;
-                        string controlNo = newCount.ToString().PadLeft(4, '0');
+                        string controlNo = newCount.ToString().PadLeft(5, '0');
                         string finalControlNo = controlNo + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
                         it = new IndigencyTransaction
                         {
@@ -181,6 +180,140 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [Route("api/Print/GenerateBusinessClearanceTransaction")]
+        [HttpPost]
+        public async Task<IHttpActionResult> GenerateBusinessClearanceTransaction(PrintBusinessClearanceModel printModel)
+        {
+            using (var context = new BimsContext())
+            {
+                var business = (from bus in context.Businesses
+                                join owner in context.Owners on bus.OwnerID equals owner.ID
+                                where bus.ID == printModel.BusinessID
+                                select new
+                                {
+                                    bus.KindOfBusiness,
+                                    bus.ID,
+                                    bus.BusinessAddress,
+                                    bus.BusinessName,
+                                    bus.BusinessContactNo,
+                                    bus.FloorArea,
+                                    bus.DTI_SEC_RegNo,
+                                    bus.Capitalization,
+                                    Owner = owner
+                                    //OwnerName = owner.FirstName + " " + owner.MiddleName + " " + owner.LastName,
+                                    //OwnerAddress = owner.Address,
+                                    //OwnerContactNo = owner.ContactNo
+                                }).FirstOrDefault();
+                if (business == null)
+                {
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Fail,
+                        message = "No Business Found"
+                    });
+                }
+                else
+                {
+                    //Create a new Transaction
+                    //Fetch who Create it
+                    var processingUser = context.Users.Find(printModel.ProcessedByID);
+                    string appendingControlNo = BimsHelper.ExtractInitialsFromName(processingUser.FirstName + " " + processingUser.MiddleName + " " + processingUser.LastName);
+
+                    int newCount = context.BusinessClearanceTransactions.AsNoTracking().Where(b => b.DateCreated.Value.Year == DateTime.Now.Year).Count();
+                    newCount += 1;
+                    string controlNo = newCount.ToString().PadLeft(5, '0');
+                    string finalControlNo = controlNo + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
+
+                    var thisBusiness = context.Businesses.Find(business.ID);
+                    var bc = new BusinessClearance
+                    {
+                        BusinessName = business.BusinessName,
+                        BusinessAddress = business.BusinessAddress,
+                        BusinessContactNo = business.BusinessContactNo,
+                        FloorArea = business.FloorArea,
+                        Capitalization = business.Capitalization,
+                        DTI_SEC_RegNo = business.DTI_SEC_RegNo,
+                        KindOfBusiness = business.KindOfBusiness,
+                        ControlNo = finalControlNo,
+                        Business = thisBusiness,
+                        OwnerFullName = business.Owner.FirstName + " " + business.Owner.MiddleName + " " + business.Owner.LastName,
+                        OwnerAddress = business.Owner.Address,
+                        OwnerContactNo = business.Owner.ContactNo,
+                        CreatedBy = printModel.ProcessedByID,
+                        ModifiedBy = printModel.ProcessedByID
+                    };
+                    context.BusinessClearanceTransactions.Add(bc);
+                    context.SaveChanges();
+
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Success,
+                        message = "Successfully Created a New Transaction",
+                        data = new 
+                        {
+                            BusinessName = business.BusinessName,
+                            BusinessAddress = business.BusinessAddress,
+                            BusinessContactNo = business.BusinessContactNo,
+                            FloorArea = business.FloorArea,
+                            Capitalization = business.Capitalization,
+                            DTI_SEC_RegNo = business.DTI_SEC_RegNo,
+                            KindOfBusiness = business.KindOfBusiness,
+                            ControlNo = finalControlNo,
+                            OwnerFullName = business.Owner.FirstName + " " + business.Owner.MiddleName + " " + business.Owner.LastName,
+                            OwnerAddress = business.Owner.Address,
+                            OwnerContactNo = business.Owner.ContactNo,
+                            OwnerImage = business.Owner.Image
+                        }
+                    });
+                }
+            }
+        }
+
+        [AllowAnonymous]
+        [Route("api/Print/GetBusinessPrintHistory/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetBusinessPrintHistory(int id)
+        {
+            using (var context = new BimsContext())
+            {
+                var business = await context.Businesses.FindAsync(id);
+                if (business == null)
+                {
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Fail,
+                        message = "No Business Found"
+                    });
+                }
+                else
+                {
+                    var list = (from bc in context.BusinessClearanceTransactions
+                                join u in context.Users on bc.CreatedBy equals u.ID
+                                where bc.BusinessID == id
+                                select new
+                                {
+                                    ID = bc.ID,
+                                    DateCreated = bc.DateCreated,
+                                    PrintedBy = u.FirstName + " " + u.MiddleName + " " + u.LastName,
+                                    ControlNo = bc.ControlNo
+                                }).ToList();
+
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Success,
+                        message = "Successfully Fetched",
+                        data = list
+                    });
+                }
+            }
+        }
+
+        public class PrintBusinessClearanceModel
+        {
+            public int BusinessID { get; set; }
+            public int ProcessedByID { get; set; }
+        }
 
         public class PrintModel
         {

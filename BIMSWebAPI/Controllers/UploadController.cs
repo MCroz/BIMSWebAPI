@@ -143,5 +143,86 @@ namespace BIMSWebAPI.Controllers
         {
             return prefix + "_" + DateTime.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
         }
+
+        [AllowAnonymous]
+        [Route("api/Upload/UploadOwnerImage")]
+        [HttpPost]
+        public async Task<IHttpActionResult> UploadOwnerImage()
+        {
+            string newFilename = "";
+            //Dictionary<string, object> dict = new Dictionary<string, object>();
+            try
+            {
+
+                var httpRequest = HttpContext.Current.Request;
+
+                foreach (string file in httpRequest.Files)
+                {
+                    HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
+
+                    var postedFile = httpRequest.Files[file];
+                    if (postedFile != null && postedFile.ContentLength > 0)
+                    {
+
+                        int MaxContentLength = 1024 * 1024 * 20; //Size = 1 MB  
+
+                        //IList<string> AllowedFileExtensions = new List<string> { ".jpg", ".gif", ".png" };
+                        IList<string> AllowedFileExtensions = new List<string> { ".jpg", ".gif", ".png" };
+                        var ext = postedFile.FileName.Substring(postedFile.FileName.LastIndexOf('.'));
+                        var extension = ext.ToLower();
+                        if (!AllowedFileExtensions.Contains(extension))
+                        {
+
+                            var message = string.Format("Please Upload image of type .jpg,.gif,.png.");
+                            return Ok(new ResponseModel
+                            {
+                                status = ResponseStatus.Fail,
+                                message = "Please Upload image of type .jpg,.gif,.png."
+                            });
+                        }
+                        else if (postedFile.ContentLength > MaxContentLength)
+                        {
+
+                            //var message = string.Format("Please Upload a file upto 1 mb.");
+                            return Ok(new ResponseModel
+                            {
+                                status = ResponseStatus.Fail,
+                                message = "Please Upload a file upto 20 mb."
+                            });
+                        }
+                        else
+                        {
+                            //var filePath = HttpContext.Current.Server.MapPath("~/Images/ResidentImages/" + postedFile.FileName);
+                            newFilename = GenerateNewFileName() + extension;
+                            var filePath = HttpContext.Current.Server.MapPath("~/Images/OwnerImages/" + newFilename);
+                            postedFile.SaveAs(filePath);
+                        }
+                    }
+
+                    return Ok(new ResponseModel
+                    {
+                        status = ResponseStatus.Success,
+                        message = "Images Successfully Uploaded",
+                        data = newFilename
+                    });
+                }
+                return Ok(new ResponseModel
+                {
+                    status = ResponseStatus.Fail,
+                    message = "Please Select an Image"
+                });
+            }
+            catch (Exception ex)
+            {
+                //var res = string.Format("some Message");
+                //dict.Add("error", res);
+                //return Request.CreateResponse(HttpStatusCode.NotFound, dict);
+                return Ok(new ResponseModel
+                {
+                    status = ResponseStatus.Fail,
+                    message = ex.Message
+                });
+            }
+        }
     }
 }

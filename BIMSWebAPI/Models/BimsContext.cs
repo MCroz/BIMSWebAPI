@@ -23,6 +23,10 @@ namespace BIMSWebAPI.Models
         public DbSet<SecretQuestion> SecretQuestions { get; set; }
         public DbSet<IndigencyTransaction> IndigencyTransactions { get; set; }
         public DbSet<BarangayClearanceTransaction> BarangayClearanceTransactions { get; set; }
+        public DbSet<Owner> Owners { get; set; }
+        public DbSet<Business> Businesses { get; set; }
+        public DbSet<BusinessClearance> BusinessClearanceTransactions { get; set; }
+        public DbSet<SystemLog> SystemLogs { get; set; }
 
 
         //Reference the name of your connection string

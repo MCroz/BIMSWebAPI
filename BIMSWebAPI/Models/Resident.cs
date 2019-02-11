@@ -24,5 +24,7 @@ namespace BIMSWebAPI.Models
         public string Citizenship { get; set; }
 
         public string Image { get; set; }
+
+        public int isRemoved { get; set; }
     }
 }

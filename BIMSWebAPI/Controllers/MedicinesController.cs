@@ -1,9 +1,11 @@
-﻿using BIMSWebAPI.Models;
+﻿using BIMSWebAPI.App_Code;
+using BIMSWebAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -38,6 +40,27 @@ namespace BIMSWebAPI.Controllers
             using (var context = new BimsContext())
             {
                 context.Medicines.Add(medicine);
+
+                //For Logging
+                var currentUser = context.Users.Find(medicine.ModifiedBy);
+                string logChanges = "";
+                foreach (PropertyInfo pi in medicine.GetType().GetProperties())
+                {
+                    //pi.GetValue(myClass, null)?.ToString();
+                    if (pi.Name != "ModifiedBy" && pi.Name != "CreatedBy" && pi.Name != "DateModified" && pi.Name != "DateCreated" && pi.Name != "ID")
+                    {
+                        if (logChanges != "")
+                        {
+                            logChanges += ", ";
+                        }
+                        logChanges += pi.GetValue(medicine, null)?.ToString() != "" ? pi.Name + " = " + pi.GetValue(medicine, null)?.ToString() : "";
+                    }
+                }
+                string changes = currentUser.Username + " Added A Medicine and Set: " + logChanges;
+                AuditLogHelper.GenerateLog(context, "Create", changes);
+                //For Logging
+
+
                 context.SaveChanges();
             }
             return Ok(new ResponseModel()
@@ -122,6 +145,11 @@ namespace BIMSWebAPI.Controllers
                 {
                     selectedMedicine.MedicineName = medicine.MedicineName;
                     selectedMedicine.Description = medicine.Description;
+
+                    var currentUser = context.Users.Find(medicine.ModifiedBy);
+                    string changes = currentUser.Username + " Updated Medicine: " + AuditLogHelper.FetchChanges(context);
+                    AuditLogHelper.GenerateLog(context, "Update", changes);
+
                     context.SaveChanges();
                     message = "Successfully Updated";
                     thisStatus = ResponseStatus.Success;

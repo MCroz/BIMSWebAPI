@@ -1,10 +1,12 @@
-﻿using BIMSWebAPI.Models;
+﻿using BIMSWebAPI.App_Code;
+using BIMSWebAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -62,6 +64,27 @@ namespace BIMSWebAPI.Controllers
                 else
                 {
                     Stock newStock = new Models.Stock { ModifiedBy = model.ModifiedBy, CreatedBy = model.CreatedBy, MedicineID = model.MedicineID, ExpirationDate = model.ExpirationDate, Medicine = medicine };
+
+                    //For Logging
+                    var currentUser = context.Users.Find(newStock.ModifiedBy);
+                    string logChanges = "";
+                    foreach (PropertyInfo pi in newStock.GetType().GetProperties())
+                    {
+                        //pi.GetValue(myClass, null)?.ToString();
+                        if (pi.Name != "ModifiedBy" && pi.Name != "CreatedBy" && pi.Name != "DateModified" && pi.Name != "DateCreated" && pi.Name != "ID")
+                        {
+                            if (logChanges != "")
+                            {
+                                logChanges += ", ";
+                            }
+                            logChanges += pi.GetValue(newStock, null)?.ToString() != "" ? pi.Name + " = " + pi.GetValue(newStock, null)?.ToString() : "";
+                        }
+                    }
+                    string changes = currentUser.Username + " Added A New Stock and Set: " + logChanges;
+                    AuditLogHelper.GenerateLog(context, "Create", changes);
+                    //For Logging
+
+
                     context.Stocks.Add(newStock);
                     context.SaveChanges();
                     InventoryMovement im = new InventoryMovement { Quantity = model.Quantity, ModifiedBy = model.ModifiedBy, CreatedBy = model.CreatedBy, StockID = newStock.ID, Stock = newStock};
