@@ -145,8 +145,9 @@ namespace BIMSWebAPI.Controllers
                     selectedResident.Gender = resident.Gender;
                     selectedResident.CivilStatus = resident.CivilStatus;
                     selectedResident.BirthDate = resident.BirthDate;
-                    selectedResident.AddressNo = resident.AddressNo;
-                    selectedResident.AddressSt = resident.AddressSt;
+                    //selectedResident.AddressNo = resident.AddressNo;
+                    //selectedResident.AddressSt = resident.AddressSt;
+                    selectedResident.Address = resident.Address;
                     selectedResident.AddressZone = resident.AddressZone;
                     selectedResident.BirthPlace = resident.BirthPlace;
                     selectedResident.Citizenship = resident.Citizenship;

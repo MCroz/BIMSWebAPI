@@ -209,24 +209,26 @@ namespace BIMSWebAPI.Controllers
                             {
                                 var selectedBus = context.Businesses.Find(bus.ID);
 
-                                FieldInfo[] fi = selectedBus.GetType().GetFields();
-                                string logChanges = "";
-                                foreach (PropertyInfo f in selectedBus.GetType().GetProperties())
-                                {
-                                    if (!f.GetValue(selectedBus).Equals(f.GetValue(bus)))
-                                    {
-                                        if (f.Name != "ModifiedBy" && f.Name != "CreatedBy" && f.Name != "DateModified" && f.Name != "DateCreated")
-                                        {
-                                            if (logChanges != "")
-                                            {
-                                                logChanges += ", ";
-                                            }
-                                            logChanges += f.GetValue(bus, null)?.ToString() != "" ? f.Name + " = " + f.GetValue(bus, null)?.ToString() : "";
-                                        }
-                                    }
-                                }
-                                string changes1 = currentUser.Username + " Updated Business and Set: " + logChanges;
-                                AuditLogHelper.GenerateLog(context, "Update", changes1);
+                                //FieldInfo[] fi = selectedBus.GetType().GetFields();
+                                //string logChanges = "";
+                                //foreach (PropertyInfo f in bus.GetType().GetProperties())
+                                //{
+                                //    if (!f.GetValue(selectedBus).Equals(f.GetValue(bus)))
+                                //    {
+                                //        if (f.Name != "ModifiedBy" && f.Name != "CreatedBy" && f.Name != "DateModified" && f.Name != "DateCreated")
+                                //        {
+                                //            if (logChanges != "")
+                                //            {
+                                //                logChanges += ", ";
+                                //            }
+                                //            logChanges += f.GetValue(bus, null)?.ToString() != "" ? f.Name + " = " + f.GetValue(bus, null)?.ToString() : "";
+                                //        }
+                                //    }
+                                //}
+                                //string changes1 = currentUser.Username + " Updated Business and Set: " + logChanges;
+                                //AuditLogHelper.GenerateLog(context, "Update", changes1);
+
+                                //TODO Add Logging
 
                                 selectedBus.BusinessName = bus.BusinessName;
                                 selectedBus.BusinessAddress = bus.BusinessAddress;

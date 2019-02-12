@@ -44,7 +44,7 @@ namespace BIMSWebAPI.Controllers
                         int newCount = context.BarangayClearanceTransactions.AsNoTracking().Where(b => b.DateCreated.Value.Year == DateTime.Now.Year).Count();
                         newCount += 1;
                         string controlNo = newCount.ToString().PadLeft(5, '0');
-                        string finalControlNo = controlNo + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
+                        string finalControlNo = controlNo + "-C-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
                         bc = new BarangayClearanceTransaction
                         {
                             ResidentID = printModel.ResidentID,
@@ -53,7 +53,7 @@ namespace BIMSWebAPI.Controllers
                             ControlNo = finalControlNo,
                             CreatedBy = printModel.ProcessedByID,
                             ModifiedBy = printModel.ProcessedByID,
-                            FullAddress = resident.AddressNo + " " + resident.AddressSt,
+                            FullAddress = resident.Address,
                             FullName = resident.FirstName + " " + resident.MiddleName + " " + resident.LastName,
                             Image = resident.Image
                         };
@@ -72,7 +72,7 @@ namespace BIMSWebAPI.Controllers
                         int newCount = context.IndigencyTransactions.AsNoTracking().Where(b => b.DateCreated.Value.Year == DateTime.Now.Year).Count();
                         newCount += 1;
                         string controlNo = newCount.ToString().PadLeft(5, '0');
-                        string finalControlNo = controlNo + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
+                        string finalControlNo = controlNo + "-I-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
                         it = new IndigencyTransaction
                         {
                             ResidentID = printModel.ResidentID,
@@ -81,7 +81,7 @@ namespace BIMSWebAPI.Controllers
                             ControlNo = finalControlNo,
                             CreatedBy = printModel.ProcessedByID,
                             ModifiedBy = printModel.ProcessedByID,
-                            FullAddress = resident.AddressNo + " " + resident.AddressSt,
+                            FullAddress = resident.Address,
                             FullName = resident.FirstName + " " + resident.MiddleName + " " + resident.LastName,
                             Image = resident.Image
                         };
@@ -223,7 +223,7 @@ namespace BIMSWebAPI.Controllers
                     int newCount = context.BusinessClearanceTransactions.AsNoTracking().Where(b => b.DateCreated.Value.Year == DateTime.Now.Year).Count();
                     newCount += 1;
                     string controlNo = newCount.ToString().PadLeft(5, '0');
-                    string finalControlNo = controlNo + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
+                    string finalControlNo = controlNo + "-BC-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "-" + appendingControlNo;
 
                     var thisBusiness = context.Businesses.Find(business.ID);
                     var bc = new BusinessClearance
