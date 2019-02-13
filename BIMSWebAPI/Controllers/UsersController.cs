@@ -12,9 +12,10 @@ using System.Reflection;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class UsersController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/GetUserList")]
         [HttpGet]
         public async Task<IHttpActionResult> GetUserList()
@@ -33,7 +34,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/AddUser")]
         [HttpPost]
         public async Task<IHttpActionResult> AddUser(Models.User user)
@@ -94,7 +95,7 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/DeleteUser/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> DeleteUser(int id)
@@ -124,7 +125,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/GetUserInfo/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetUserInfo(int id)
@@ -154,7 +155,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/UpdateUser")]
         [HttpPost]
         public async Task<IHttpActionResult> UpdateUser(Models.User user)
@@ -207,7 +208,7 @@ namespace BIMSWebAPI.Controllers
         }
 
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/ResetPassword/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> ResetPassword(int id)
@@ -239,7 +240,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/UnblockUser/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> UnblockUser(int id)
@@ -270,7 +271,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/ForgotPassword")]
         [HttpPost]
         public async Task<IHttpActionResult> ForgotPassword(ForgotPasswordModel model)
@@ -308,7 +309,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/FirstTimeLogin")]
         [HttpPost]
         public async Task<IHttpActionResult> FirstTimeLogin(FirstTimeLoginModel model)
@@ -345,7 +346,7 @@ namespace BIMSWebAPI.Controllers
         }
 
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Users/UpdateUserProfile")]
         [HttpPost]
         public async Task<IHttpActionResult> UpdateUserProfile(UpdateUserProfileModel model)

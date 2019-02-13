@@ -10,9 +10,10 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class DispenseController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Dispense/GetMedicineStocksList")]
         [HttpGet]
         public async Task<IHttpActionResult> GetMedicineStocksList()
@@ -44,7 +45,7 @@ namespace BIMSWebAPI.Controllers
 
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Dispense/DispenseTransaction")]
         [HttpPost]
         public async Task<IHttpActionResult> DispenseTransaction(CustomDispenseData model)
@@ -72,7 +73,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Dispense/ListDispenseTransaction/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> ListDispenseTransaction(int id)
@@ -110,7 +111,7 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Dispense/ListDispenseMedicines/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> ListDispenseMedicines(int id)

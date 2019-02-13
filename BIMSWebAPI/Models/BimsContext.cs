@@ -5,6 +5,8 @@ using System.Linq;
 using System.Web;
 using MySql.Data.Entity;
 using System.Threading.Tasks;
+using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Infrastructure;
 
 namespace BIMSWebAPI.Models
 {
@@ -39,7 +41,14 @@ namespace BIMSWebAPI.Models
         {
             AddTimestamps();
             return base.SaveChanges();
+
         }
+
+        //public override int SaveChanges()
+        //{
+        //    AddTimestamps();
+        //    return base.SaveChanges();
+        //}
 
         public override async Task<int> SaveChangesAsync()
         {

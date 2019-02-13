@@ -8,9 +8,10 @@ using System.Reflection;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class ResidentsController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Residents/GetResidentList")]
         [HttpGet]
         public async Task<IHttpActionResult> GetResidentList()
@@ -29,7 +30,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Residents/AddResident")]
         [HttpPost]
         public async Task<IHttpActionResult> AddResident(Resident resident)
@@ -67,7 +68,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Residents/DeleteResident/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> DeleteResident(int id)
@@ -97,7 +98,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Residents/GetResidentInfo/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetResidentInfo(int id)
@@ -127,7 +128,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Residents/UpdateResident")]
         [HttpPost]
         public async Task<IHttpActionResult> UpdateResident(Resident resident)
@@ -176,7 +177,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Residents/SearchResident")]
         [HttpPost]
         public async Task<IHttpActionResult> SearchResident(SearchModel search)

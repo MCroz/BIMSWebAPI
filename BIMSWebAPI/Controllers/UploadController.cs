@@ -11,9 +11,10 @@ using BIMSWebAPI.Models;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class UploadController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Upload/UploadImages1")]
         [HttpPost]
         //public async Task<HttpResponseMessage> UploadImages()
@@ -59,7 +60,7 @@ namespace BIMSWebAPI.Controllers
             //return Ok();
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Upload/UploadImages")]
         [HttpPost]
         public async Task<IHttpActionResult> UploadImages()
@@ -144,7 +145,7 @@ namespace BIMSWebAPI.Controllers
             return prefix + "_" + DateTime.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Upload/UploadOwnerImage")]
         [HttpPost]
         public async Task<IHttpActionResult> UploadOwnerImage()

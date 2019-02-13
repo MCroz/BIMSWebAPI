@@ -11,9 +11,10 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class MedicinesController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Medicines/GetMedicineList")]
         [HttpGet]
         public async Task<IHttpActionResult> GetMedicineList()
@@ -32,7 +33,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Medicines/AddMedicine")]
         [HttpPost]
         public async Task<IHttpActionResult> AddMedicine(Medicine medicine)
@@ -71,7 +72,7 @@ namespace BIMSWebAPI.Controllers
         }
 
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Medicines/DeleteMedicine/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> DeleteMedicine(int id)
@@ -101,7 +102,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Medicines/GetMedicineInfo/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetMedicineInfo(int id)
@@ -131,7 +132,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Medicines/UpdateMedicine")]
         [HttpPost]
         public async Task<IHttpActionResult> UpdateMedicine(Medicine medicine)
@@ -168,7 +169,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Medicines/GetMedicinesListDropdown")]
         [HttpGet]
         public async Task<IHttpActionResult> GetMedicinesListDropdown()

@@ -65,11 +65,20 @@ namespace BIMSWebAPI.Controllers
                     user.Attempt = 0;
                     AuditLogHelper.GenerateLog(context, "Login", model.username + " Logged In Successfully.");
                     context.SaveChanges();
+
+                    //Encode To Base64 the UserID
+                    byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(user.ID.ToString());
+
+                    string userBase64 = System.Convert.ToBase64String(toEncodeAsBytes);
+
                     return Ok(new ResponseModel()
                     {
                         status = ResponseStatus.Success,
                         message = "Successfully Logged-In",
-                        data = user
+                        data = new {
+                            User = user,
+                            Authorization = userBase64
+                        }
                     });
                 }
             }
@@ -80,6 +89,32 @@ namespace BIMSWebAPI.Controllers
             {
                 status = ResponseStatus.Fail,
                 message = "No Account Match for the Entered Username"
+            });
+        }
+
+        [Authorize]
+        [Route("api/Login/Logout/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> Logout(int id)
+        {
+            using (var context = new BimsContext())
+            {
+                var user = context.Users.Find(id);
+                if (user == null)
+                {
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Fail,
+                        message = "No Account Found"
+                    });
+                }
+                AuditLogHelper.GenerateLog(context, "Logout", user.Username + " Logged out of the System.");
+                context.SaveChanges();
+            }
+            return Ok(new ResponseModel()
+            {
+                status = ResponseStatus.Success,
+                message = "Successfully Logged Out"
             });
         }
     }

@@ -10,9 +10,10 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class BusinessController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Business/GetBusinessList")]
         [HttpGet]
         public async Task<IHttpActionResult> GetBusinessList()
@@ -46,7 +47,7 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Business/GetBusinessInfo/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetBusinessInfo(int id)

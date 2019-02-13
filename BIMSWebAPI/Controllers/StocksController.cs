@@ -12,9 +12,10 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class StocksController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Stocks/GetStocksList")]
         [HttpGet]
         public async Task<IHttpActionResult> GetStocksList()
@@ -45,7 +46,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Stocks/AddStock")]
         [HttpPost]
         public async Task<IHttpActionResult> AddStock(AddStockClass model)
@@ -99,7 +100,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Stocks/GetMedicineStocks/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetMedicineStocks(int id)

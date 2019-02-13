@@ -12,9 +12,10 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class OwnerController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Owner/GetOwnerList")]
         [HttpGet]
         public async Task<IHttpActionResult> GetOwnerList()
@@ -34,7 +35,7 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Owner/AddOwner")]
         [HttpPost]
         public async Task<IHttpActionResult> AddOwner(Owner owner)
@@ -91,7 +92,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Owner/GetOwnerInfo/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetOwnerInfo(int id)
@@ -142,7 +143,7 @@ namespace BIMSWebAPI.Controllers
             public object OwnerBusiness;
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Owner/DeleteOwner/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> DeleteOwner(int id)
@@ -172,7 +173,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Owner/UpdateOwner")]
         [HttpPost]
         public async Task<IHttpActionResult> UpdateOwner(Owner owner)

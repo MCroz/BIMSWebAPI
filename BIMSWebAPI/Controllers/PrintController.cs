@@ -11,9 +11,10 @@ using BIMSWebAPI.App_Code;
 
 namespace BIMSWebAPI.Controllers
 {
+    [Authorize]
     public class PrintController : ApiController
     {
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Print/InitialPrint")]
         [HttpPost]
         public async Task<IHttpActionResult> InitialPrint(PrintModel printModel)
@@ -100,7 +101,7 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Print/GetUserIndigencyTransactions/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetUserIndigencyTransactions(int id)
@@ -140,7 +141,7 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Print/GetUserBarangayClearanceTransactions/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetUserBarangayClearanceTransactions(int id)
@@ -180,7 +181,7 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Print/GenerateBusinessClearanceTransaction")]
         [HttpPost]
         public async Task<IHttpActionResult> GenerateBusinessClearanceTransaction(PrintBusinessClearanceModel printModel)
@@ -270,7 +271,7 @@ namespace BIMSWebAPI.Controllers
             }
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("api/Print/GetBusinessPrintHistory/{id}")]
         [HttpGet]
         public async Task<IHttpActionResult> GetBusinessPrintHistory(int id)
