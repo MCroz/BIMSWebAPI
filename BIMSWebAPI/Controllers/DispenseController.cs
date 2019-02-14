@@ -55,14 +55,13 @@ namespace BIMSWebAPI.Controllers
                 var resident = context.Residents.Find(model.ResidentID);
                 DispenseTransaction dispense = new DispenseTransaction { Resident = resident, ResidentID = resident.ID, PrescriptionDescription = model.PrescriptionDescription, CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy };
                 context.DispenseTransactions.Add(dispense);
-                context.SaveChanges();
                 foreach (CustomDispenseMedicineItem itm in model.Items)
                 {
                     int qty = -1 * itm.Quantity;
                     var stock = context.Stocks.Find(itm.StockID);
-                    InventoryMovement im = new InventoryMovement { CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy, StockID = itm.StockID, Quantity =  qty, DispenseTransactionID = dispense.ID, DispenseTransaction = dispense, Stock = stock};
+                    InventoryMovement im = new InventoryMovement { CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy, StockID = itm.StockID, Quantity =  qty, DispenseTransaction = dispense, Stock = stock};
                     context.InventoryMovement.Add(im);
-                    dispense.InventoryMovement.Add(im);
+                    //dispense.InventoryMovement.Add(im);
                 }
                 context.SaveChanges();
             }
@@ -92,15 +91,38 @@ namespace BIMSWebAPI.Controllers
                 else
                 {
                     //Get All Dispense Transaction
-                    var dispenseTransactions = (from dt in context.DispenseTransactions
-                                                join res in context.Residents on dt.ResidentID equals resident.ID
-                                                join user in context.Users on dt.CreatedBy equals user.ID
-                                                select new {
-                                                    ID = dt.ID,
-                                                    CreatedBy = user.FirstName,
-                                                    PreparationDescription = dt.PrescriptionDescription,
-                                                    DateDispensed = dt.DateCreated
-                                                }).ToList();
+                    //var dispenseTransactions = (from dt in context.DispenseTransactions
+                    //                            join res in context.Residents on dt.ResidentID equals resident.ID
+                    //                            join user in context.Users on dt.CreatedBy equals user.ID
+                    //                            where dt.ResidentID == id
+                    //                            select new {
+                    //                                ID = dt.ID,
+                    //                                CreatedBy = user.FirstName,
+                    //                                PreparationDescription = dt.PrescriptionDescription,
+                    //                                DateDispensed = dt.DateCreated
+                    //                            }).ToList();
+
+                    var dispenseTransactions = (from finalDt in (from im in context.InventoryMovement
+                                                   join dt in context.DispenseTransactions on im.DispenseTransactionID equals dt.ID
+                                                   group im by im.DispenseTransaction into g
+                                                   select new
+                                                   {
+                                                       ID = g.Key.ID,
+                                                       DateDispensed = g.Key.DateCreated,
+                                                       UserID = g.Key.CreatedBy,
+                                                       PrescriptionDescription = g.Key.PrescriptionDescription
+                                                   }
+                                  )
+                                  join finalUser in context.Users on finalDt.UserID equals finalUser.ID
+                                  select new
+                                  {
+                                      DateDispensed = finalDt.DateDispensed,
+                                      CreatedBy = finalUser.FirstName + " " + finalUser.MiddleName + " " + finalUser.LastName,
+                                      PreparationDescription = finalDt.PrescriptionDescription,
+                                      ID = finalDt.ID
+                                  }).ToList();
+
+
                     return Ok(new ResponseModel()
                     {
                         status = ResponseStatus.Success,

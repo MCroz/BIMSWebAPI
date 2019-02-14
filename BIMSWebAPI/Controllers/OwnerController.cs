@@ -200,7 +200,7 @@ namespace BIMSWebAPI.Controllers
                     bool isExistingDTI = false;
                     foreach (Business bus in owner.Businesses)
                     {
-                        if (bus.ID != null)
+                        if (bus.ID != null && bus.ID != 0)
                         {
                             if (context.Businesses.Where(b => b.DTI_SEC_RegNo == bus.DTI_SEC_RegNo && b.ID != bus.ID).ToList().Count() > 0)
                             {
@@ -250,26 +250,27 @@ namespace BIMSWebAPI.Controllers
                             }
                             else
                             {
-                                bus.ModifiedBy = owner.CreatedBy;
                                 bus.ModifiedBy = owner.ModifiedBy;
-                                context.Businesses.Add(bus);
+                                bus.CreatedBy = owner.ModifiedBy;
+                                bus.Owner = selectedOwner;
+                                selectedOwner.Businesses.Add(bus);
 
-                                var curUser = context.Users.Find(owner.ModifiedBy);
-                                string logChanges = "";
-                                foreach (PropertyInfo pi in bus.GetType().GetProperties())
-                                {
-                                    //pi.GetValue(myClass, null)?.ToString();
-                                    if (pi.Name != "ModifiedBy" && pi.Name != "CreatedBy" && pi.Name != "DateModified" && pi.Name != "DateCreated" && pi.Name != "ID")
-                                    {
-                                        if (logChanges != "")
-                                        {
-                                            logChanges += ", ";
-                                        }
-                                        logChanges += pi.GetValue(bus, null)?.ToString() != "" ? pi.Name + " = " + pi.GetValue(bus, null)?.ToString() : "";
-                                    }
-                                }
-                                string changes1 = currentUser.Username + " Added A Business and Set: " + logChanges;
-                                AuditLogHelper.GenerateLog(context, "Create", changes1);
+                                //var curUser = context.Users.Find(owner.ModifiedBy);
+                                //string logChanges = "";
+                                //foreach (PropertyInfo pi in bus.GetType().GetProperties())
+                                //{
+                                //    //pi.GetValue(myClass, null)?.ToString();
+                                //    if (pi.Name != "ModifiedBy" && pi.Name != "CreatedBy" && pi.Name != "DateModified" && pi.Name != "DateCreated" && pi.Name != "ID")
+                                //    {
+                                //        if (logChanges != "")
+                                //        {
+                                //            logChanges += ", ";
+                                //        }
+                                //        logChanges += pi.GetValue(bus, null)?.ToString() != "" ? pi.Name + " = " + pi.GetValue(bus, null)?.ToString() : "";
+                                //    }
+                                //}
+                                //string changes1 = currentUser.Username + " Added A Business and Set: " + logChanges;
+                                //AuditLogHelper.GenerateLog(context, "Create", changes1);
                             }
                         }
                     }
