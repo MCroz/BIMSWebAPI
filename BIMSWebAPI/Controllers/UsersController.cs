@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class UsersController : ApiController
     {
         //[AllowAnonymous]
@@ -271,7 +271,7 @@ namespace BIMSWebAPI.Controllers
             });
         }
 
-        //[AllowAnonymous]
+        [AllowAnonymous]
         [Route("api/Users/ForgotPassword")]
         [HttpPost]
         public async Task<IHttpActionResult> ForgotPassword(ForgotPasswordModel model)

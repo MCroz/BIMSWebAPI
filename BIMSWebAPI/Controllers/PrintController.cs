@@ -11,7 +11,7 @@ using BIMSWebAPI.App_Code;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class PrintController : ApiController
     {
         //[AllowAnonymous]
@@ -54,7 +54,7 @@ namespace BIMSWebAPI.Controllers
                             ControlNo = finalControlNo,
                             CreatedBy = printModel.ProcessedByID,
                             ModifiedBy = printModel.ProcessedByID,
-                            FullAddress = resident.Address,
+                            FullAddress = resident.AddressNo + " " + resident.AddressSt + " " + resident.AddressZone,
                             FullName = resident.FirstName + " " + resident.MiddleName + " " + resident.LastName,
                             Image = resident.Image
                         };
@@ -82,7 +82,7 @@ namespace BIMSWebAPI.Controllers
                             ControlNo = finalControlNo,
                             CreatedBy = printModel.ProcessedByID,
                             ModifiedBy = printModel.ProcessedByID,
-                            FullAddress = resident.Address,
+                            FullAddress = resident.AddressNo + " " + resident.AddressSt + " " + resident.AddressZone,
                             FullName = resident.FirstName + " " + resident.MiddleName + " " + resident.LastName,
                             Image = resident.Image
                         };

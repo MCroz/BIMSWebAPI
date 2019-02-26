@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class ResidentsController : ApiController
     {
         //[AllowAnonymous]
@@ -146,18 +146,18 @@ namespace BIMSWebAPI.Controllers
                     selectedResident.Gender = resident.Gender;
                     selectedResident.CivilStatus = resident.CivilStatus;
                     selectedResident.BirthDate = resident.BirthDate;
-                    //selectedResident.AddressNo = resident.AddressNo;
-                    //selectedResident.AddressSt = resident.AddressSt;
-                    selectedResident.Address = resident.Address;
+                    selectedResident.AddressNo = resident.AddressNo;
+                    selectedResident.AddressSt = resident.AddressSt;
+                    //selectedResident.Address = resident.Address;
                     selectedResident.AddressZone = resident.AddressZone;
                     selectedResident.BirthPlace = resident.BirthPlace;
                     selectedResident.Citizenship = resident.Citizenship;
                     selectedResident.ModifiedBy = resident.ModifiedBy;
                     selectedResident.Image = resident.Image;
 
-                    var currentUser = context.Users.Find(selectedResident.ModifiedBy);
-                    string changes = currentUser.Username + " Updated Resident: " + AuditLogHelper.FetchChanges(context);
-                    AuditLogHelper.GenerateLog(context, "Update", changes);
+                    //var currentUser = context.Users.Find(selectedResident.ModifiedBy);
+                    //string changes = currentUser.Username + " Updated Resident: " + AuditLogHelper.FetchChanges(context);
+                    //AuditLogHelper.GenerateLog(context, "Update", changes);
 
                     context.SaveChanges();
                     message = "Successfully Updated";

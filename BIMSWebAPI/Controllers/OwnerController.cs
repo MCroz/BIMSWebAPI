@@ -12,7 +12,7 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class OwnerController : ApiController
     {
         //[AllowAnonymous]
@@ -22,7 +22,21 @@ namespace BIMSWebAPI.Controllers
         {
             using (var context = new BimsContext())
             {
-                var outVal = context.Owners.Where(o => o.isRemoved == 0).ToList();
+                //var outVal = context.Owners.Where(o => o.isRemoved == 0).ToList();
+                var newOut = (from bus in context.Businesses
+                              join ow in context.Owners on bus.OwnerID equals ow.ID
+                              group bus by bus.Owner into g
+                              select new
+                              {
+                                  ID = g.Key.ID,
+                                  FirstName = g.Key.FirstName,
+                                  MiddleName = g.Key.MiddleName,
+                                  LastName = g.Key.LastName,
+                                  Address = g.Key.Address,
+                                  ContactNo = g.Key.ContactNo,
+                                  Businesses = g.Key.Businesses,
+                                  Image = g.Key.Image
+                              }).ToList();
 
 
 
@@ -30,7 +44,7 @@ namespace BIMSWebAPI.Controllers
                 {
                     status = ResponseStatus.Success,
                     message = "Successfully Fetched",
-                    data = outVal
+                    data = newOut
                 });
             }
         }
@@ -119,7 +133,7 @@ namespace BIMSWebAPI.Controllers
                                       join o in context.Owners on b.OwnerID equals o.ID
                                       where b.OwnerID == owner.ID
                                       select new { b.BusinessAddress, b.BusinessName,
-                                      b.BusinessContactNo, b.Capitalization, b.DTI_SEC_RegNo, b.ID,             b.KindOfBusiness,b.FloorArea}).ToList();
+                                      b.BusinessContactNo, b.Capitalization, b.DTI_SEC_RegNo, b.ID,            b.KindOfBusiness,b.FloorArea}).ToList();
                     message = "Successfully Fetched";
                     resp = ResponseStatus.Success;
                     return Ok(new ResponseModel()

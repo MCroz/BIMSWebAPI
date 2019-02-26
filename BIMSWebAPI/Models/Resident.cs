@@ -17,9 +17,9 @@ namespace BIMSWebAPI.Models
 
         [Column(TypeName = "Date")]
         public DateTime BirthDate { get; set; }
-        //public string AddressNo { get; set; }
-        //public string AddressSt { get; set; }
-        public string Address { get; set; }
+        public string AddressNo { get; set; }
+        public string AddressSt { get; set; }
+        //public string Address { get; set; }
         public string AddressZone { get; set; }
         public string BirthPlace { get; set; }
         public string Citizenship { get; set; }

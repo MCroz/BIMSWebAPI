@@ -12,7 +12,7 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class StocksController : ApiController
     {
         //[AllowAnonymous]
@@ -111,13 +111,14 @@ namespace BIMSWebAPI.Controllers
                            join stock in context.Stocks on im.StockID equals stock.ID
                            join medicine in context.Medicines on stock.MedicineID equals medicine.ID
                            where medicine.ID == id
-                           group im by new { medicine.MedicineName, stock.ID, medicine.Description, stock.ExpirationDate } into g
+                           group im by new { medicine.MedicineName, stock.ID, medicine.Description, stock.ExpirationDate, stock.DateCreated } into g
                            select new
                            {
                                MedicineName = g.Key.MedicineName,
                                Description = g.Key.Description,
                                Total = g.Sum(test => test.Quantity),
                                ExpirationDate = g.Key.ExpirationDate,
+                               DateCreated = g.Key.DateCreated,
                                StockID = g.Key.ID
                            }).ToList();
                 return Ok(new ResponseModel()

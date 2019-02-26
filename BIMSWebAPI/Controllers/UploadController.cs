@@ -11,7 +11,7 @@ using BIMSWebAPI.Models;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class UploadController : ApiController
     {
         //[AllowAnonymous]
@@ -66,6 +66,7 @@ namespace BIMSWebAPI.Controllers
         public async Task<IHttpActionResult> UploadImages()
         {
             string newFilename = "";
+            string serverFileName = "";
             //Dictionary<string, object> dict = new Dictionary<string, object>();
             try
             {
@@ -112,9 +113,9 @@ namespace BIMSWebAPI.Controllers
                             newFilename = GenerateNewFileName() + extension;
                             var filePath = HttpContext.Current.Server.MapPath("~/Images/ResidentImages/" + newFilename);
                             postedFile.SaveAs(filePath);
+                            //serverFileName = HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + "/Images/ResidentImages/" + newFilename;
                         }
                     }
-
                     return Ok(new ResponseModel
                     {
                         status = ResponseStatus.Success,
