@@ -10,7 +10,7 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class BusinessController : ApiController
     {
         //[AllowAnonymous]
@@ -72,7 +72,8 @@ namespace BIMSWebAPI.Controllers
                                     bus.Capitalization,
                                     OwnerName = owner.FirstName + " " + owner.MiddleName + " " + owner.LastName,
                                     OwnerAddress = owner.Address,
-                                    OwnerContactNo = owner.ContactNo
+                                    OwnerContactNo = owner.ContactNo,
+                                    OwnerImage = owner.Image
                                 }).FirstOrDefault();
 
                 if (business == null)

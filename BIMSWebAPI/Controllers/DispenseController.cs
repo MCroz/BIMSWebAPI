@@ -10,7 +10,7 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class DispenseController : ApiController
     {
         //[AllowAnonymous]
@@ -23,6 +23,7 @@ namespace BIMSWebAPI.Controllers
                 var outVal = (from im in context.InventoryMovement
                             join stock in context.Stocks on im.StockID equals stock.ID
                             join medicine in context.Medicines on stock.MedicineID equals medicine.ID
+                            where stock.ExpirationDate > DateTime.Now
                             group im by new { medicine.MedicineName, stock.ID, medicine.Description, stock.ExpirationDate } into g
                             select new
                             {

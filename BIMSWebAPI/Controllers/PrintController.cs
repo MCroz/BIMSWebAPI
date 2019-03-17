@@ -8,6 +8,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using BIMSWebAPI.App_Code;
+using IronPdf;
+using System.Web;
+using Spire.Doc;
+using System.Drawing;
+using Spire.Doc.Documents;
+using Spire.Doc.Fields;
 
 namespace BIMSWebAPI.Controllers
 {
@@ -61,11 +67,19 @@ namespace BIMSWebAPI.Controllers
                         context.BarangayClearanceTransactions.Add(bc);
                         context.SaveChanges();
 
+                        string filename = "BCC_" + DateTime.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
+                        Dictionary<string, string> myReplacements = new Dictionary<string, string>();
+                        myReplacements.Add("{{FullName}}", resident.FirstName + ' ' + resident.MiddleName + ' ' + resident.LastName);
+                        Image image = Image.FromFile(HttpContext.Current.Server.MapPath("~/Images/ResidentImages/" + resident.Image));
+                        string templatePath = "~/PDFS/Templates/BarangayClearance.docx";
+                        string newFilename = GeneratePDF(templatePath, myReplacements, image, filename, 153.6f, 150.72f);
+
                         return Ok(new ResponseModel()
                         {
                             status = ResponseStatus.Success,
                             message = "Successfully Created a New Transaction",
-                            data = bc
+                            //data = bc
+                            data = newFilename + ".pdf"
                         });
                     }
                     else
@@ -89,11 +103,19 @@ namespace BIMSWebAPI.Controllers
                         context.IndigencyTransactions.Add(it);
                         context.SaveChanges();
 
+                        string filename = "IC_" + DateTime.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
+                        Dictionary<string, string> myReplacements = new Dictionary<string, string>();
+                        myReplacements.Add("{{FullName}}", resident.FirstName + ' ' + resident.MiddleName + ' ' + resident.LastName);
+                        Image image = Image.FromFile(HttpContext.Current.Server.MapPath("~/Images/ResidentImages/" + resident.Image));
+                        string templatePath = "~/PDFS/Templates/Indigency.docx";
+                        string newFilename = GeneratePDF(templatePath, myReplacements, image, filename, 153.6f, 150.72f);
+
                         return Ok(new ResponseModel()
                         {
                             status = ResponseStatus.Success,
                             message = "Successfully Created a New Transaction",
-                            data = it
+                            //data = it
+                            data = newFilename + ".pdf"
                         });
                     }
 
@@ -247,28 +269,91 @@ namespace BIMSWebAPI.Controllers
                     context.BusinessClearanceTransactions.Add(bc);
                     context.SaveChanges();
 
-                    return Ok(new ResponseModel()
-                    {
+                    //Start Generating
+                    string filename = "BC_" + DateTime.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
+                    Dictionary<string, string> myReplacements = new Dictionary<string, string>();
+                    myReplacements.Add("{{OwnerFullName}}", bc.OwnerFullName);
+                    myReplacements.Add("{{Date}}", DateTime.Now.ToString("dddd, dd MMMM yyyy"));
+                    myReplacements.Add("{{OwnerAddress}}", bc.OwnerAddress);
+                    myReplacements.Add("{{OwnerContactNo}}", bc.OwnerContactNo);
+                    myReplacements.Add("{{BusinessName}}", bc.BusinessName);
+                    myReplacements.Add("{{BusinessContactNo}}", bc.BusinessContactNo);
+                    myReplacements.Add("{{BusinessAddress}}", bc.BusinessAddress);
+                    myReplacements.Add("{{FloorArea}}", bc.FloorArea);
+                    myReplacements.Add("{{DTI_SEC_RegNo}}", bc.DTI_SEC_RegNo);
+                    myReplacements.Add("{{KindOfBusiness}}", bc.KindOfBusiness);
+                    myReplacements.Add("{{Capitalization}}", bc.Capitalization.ToString("C").Replace('$', '₱'));
+                    myReplacements.Add("{{Year}}", DateTime.Now.Year.ToString());
+                    myReplacements.Add("{{ControlNo}}", bc.ControlNo);
+                    Image image = Image.FromFile(HttpContext.Current.Server.MapPath("~/Images/OwnerImages/" + business.Owner.Image));
+                    string templatePath = "~/PDFS/Templates/BusinessClearance.docx";
+                    string newFilename = GeneratePDF(templatePath,myReplacements, image,filename,113.04f, 115.2f);
+
+                    return Ok(new ResponseModel() {
                         status = ResponseStatus.Success,
                         message = "Successfully Created a New Transaction",
-                        data = new 
-                        {
-                            BusinessName = business.BusinessName,
-                            BusinessAddress = business.BusinessAddress,
-                            BusinessContactNo = business.BusinessContactNo,
-                            FloorArea = business.FloorArea,
-                            Capitalization = business.Capitalization,
-                            DTI_SEC_RegNo = business.DTI_SEC_RegNo,
-                            KindOfBusiness = business.KindOfBusiness,
-                            ControlNo = finalControlNo,
-                            OwnerFullName = business.Owner.FirstName + " " + business.Owner.MiddleName + " " + business.Owner.LastName,
-                            OwnerAddress = business.Owner.Address,
-                            OwnerContactNo = business.Owner.ContactNo,
-                            OwnerImage = business.Owner.Image
-                        }
+                        data = newFilename + ".pdf"
                     });
+                    //return Ok(new ResponseModel()
+                    //{
+                    //    status = ResponseStatus.Success,
+                    //    message = "Successfully Created a New Transaction",
+                    //    data = new 
+                    //    {
+                    //        BusinessName = business.BusinessName,
+                    //        BusinessAddress = business.BusinessAddress,
+                    //        BusinessContactNo = business.BusinessContactNo,
+                    //        FloorArea = business.FloorArea,
+                    //        Capitalization = business.Capitalization,
+                    //        DTI_SEC_RegNo = business.DTI_SEC_RegNo,
+                    //        KindOfBusiness = business.KindOfBusiness,
+                    //        ControlNo = finalControlNo,
+                    //        OwnerFullName = business.Owner.FirstName + " " + business.Owner.MiddleName + " " + business.Owner.LastName,
+                    //        OwnerAddress = business.Owner.Address,
+                    //        OwnerContactNo = business.Owner.ContactNo,
+                    //        OwnerImage = business.Owner.Image
+                    //    }
+                    //});
                 }
             }
+        }
+
+        public string GeneratePDF(string templatePath,Dictionary<string,string> replacements, Image img, string FileName, float imgH, float imgW)
+        {
+            Document document = new Document();
+            //document.LoadFromFile(HttpContext.Current.Server.MapPath("~/PDFS/Templates/BusinessClearance/BusinessClearance.docx"));
+            document.LoadFromFile(HttpContext.Current.Server.MapPath(templatePath));
+
+            foreach (KeyValuePair<string, string> replacement in replacements)
+            {
+                document.Replace(replacement.Key, replacement.Value, false, true);
+            }
+            if (img != null)
+            {
+                TextSelection[] selections = document.FindAllString("{{Image}}", true, true);
+                int index = 0;
+                TextRange range = null;
+
+                foreach (TextSelection selection in selections)
+                {
+                    DocPicture pic = new DocPicture(document);
+                    pic.LoadImage(img);
+                    pic.Height = imgH;
+                    pic.Width = imgW;
+
+                    range = selection.GetAsOneRange();
+                    index = range.OwnerParagraph.ChildObjects.IndexOf(range);
+                    range.OwnerParagraph.ChildObjects.Insert(index, pic);
+                    range.OwnerParagraph.ChildObjects.Remove(range);
+                }
+            }
+            //document.Replace("{{FullAddress}}", bc.OwnerAddress, false, true);
+
+            
+            //document.SaveToFile(HttpContext.Current.Server.MapPath("~/PDFS/Outputs/" + newFilename + ".docx"), FileFormat.Docx);
+
+            document.SaveToFile(HttpContext.Current.Server.MapPath("~/PDFS/Outputs/" + FileName + ".pdf"), FileFormat.PDF);
+            return FileName;
         }
 
         //[AllowAnonymous]

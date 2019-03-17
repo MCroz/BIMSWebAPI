@@ -29,6 +29,9 @@ namespace BIMSWebAPI.Models
         public DbSet<Business> Businesses { get; set; }
         public DbSet<BusinessClearance> BusinessClearanceTransactions { get; set; }
         public DbSet<SystemLog> SystemLogs { get; set; }
+        public DbSet<Complainant> Complainants { get; set; }
+        public DbSet<Accused> Accuseds { get; set; }
+        public DbSet<Blotter> Blotters { get; set; }
 
 
         //Reference the name of your connection string

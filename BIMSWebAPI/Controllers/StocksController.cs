@@ -20,30 +20,48 @@ namespace BIMSWebAPI.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> GetStocksList()
         {
-            BIMSDb db = new BIMSDb();
-            //db.Select("SELECT m.MedicineName as 'Medicine Name', m.Description as 'Description', ");
-            DataTable dt = db.Select("SELECT m.ID as 'ID' ,m.MedicineName as 'Medicine Name', m.Description as 'Description',COALESCE(SUM(im.Quantity),0) as 'Stock On Hand' FROM inventorymovements im INNER JOIN stocks s ON s.ID = im.StockID LEFT JOIN medicines m ON s.MedicineID = m.ID GROUP BY m.ID");
+            //BIMSDb db = new BIMSDb();
+            ////db.Select("SELECT m.MedicineName as 'Medicine Name', m.Description as 'Description', ");
+            //DataTable dt = db.Select("SELECT m.ID as 'ID' ,m.MedicineName as 'Medicine Name', m.Description as 'Description',COALESCE(SUM(im.Quantity),0) as 'Stock On Hand' FROM inventorymovements im INNER JOIN stocks s ON s.ID = im.StockID LEFT JOIN medicines m ON s.MedicineID = m.ID GROUP BY m.ID");
 
-            //List<DataRow> rows = dt.Rows.Cast<DataRow>().ToList();
-            var tempData = (from DataRow row in dt.Rows
-                            select new
-                            {
-                                ID = row["ID"].ToString(),
-                                MedicineName = row["Medicine Name"].ToString(),
-                                Description = row["Description"].ToString(),
-                                Quantity = Convert.ToInt32(row["Stock On Hand"].ToString())
-                            }).ToList();
-
-            dt.Dispose();
-            db.CloseConnection();
-
-
-            return Ok(new ResponseModel()
+            using (var context = new BimsContext())
             {
-                status = ResponseStatus.Success,
-                message = "Successfully Fetched",
-                data = tempData
-            });
+                var result = (from im in context.InventoryMovement
+                              join s in context.Stocks on im.StockID equals s.ID
+                              join m in context.Medicines on s.MedicineID equals m.ID
+                              group im by m into res
+                              select new
+                              {
+                                  ID = res.Key.ID,
+                                  MedicineName = res.Key.MedicineName,
+                                  Description = res.Key.Description,
+                                  Quantity = res.Sum(g => g.Quantity)
+                              }).ToList();
+
+                return Ok(new ResponseModel()
+                {
+                    status = ResponseStatus.Success,
+                    message = "Successfully Fetched",
+                    data = result
+                });
+            }
+
+
+                //List<DataRow> rows = dt.Rows.Cast<DataRow>().ToList();
+            //    var tempData = (from DataRow row in dt.Rows
+            //                    select new
+            //                    {
+            //                        ID = row["ID"].ToString(),
+            //                        MedicineName = row["Medicine Name"].ToString(),
+            //                        Description = row["Description"].ToString(),
+            //                        Quantity = Convert.ToInt32(row["Stock On Hand"].ToString())
+            //                    }).ToList();
+
+            //dt.Dispose();
+            //db.CloseConnection();
+
+
+
         }
 
         //[AllowAnonymous]

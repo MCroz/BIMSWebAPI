@@ -12,7 +12,7 @@ using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     public class DashboardController : ApiController
     {
         //[AllowAnonymous]

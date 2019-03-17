@@ -52,6 +52,10 @@
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="IronPdf, Version=5.0.5.17148, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IronPdf.5.0.5.2\lib\net40\IronPdf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AI.Agent.Intercept, Version=1.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.1.2.1\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
       <Private>True</Private>
@@ -85,12 +89,28 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MomentSharp, Version=1.0.6149.39352, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MomentSharp.1.0.6149.39352\lib\net45\MomentSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>..\packages\MySql.Data.6.9.12\lib\net45\MySql.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MySql.Data.Entity.EF6, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>..\packages\MySql.Data.Entity.6.9.12\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Spire.Doc, Version=7.1.13.41040, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeSpire.Doc.7.1.13\lib\net40\Spire.Doc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Spire.License, Version=1.3.7.40, Culture=neutral, PublicKeyToken=b1144360237c8b3f, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeSpire.Doc.7.1.13\lib\net40\Spire.License.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Spire.Pdf, Version=5.1.23.18040, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
+      <HintPath>..\packages\FreeSpire.Doc.7.1.13\lib\net40\Spire.Pdf.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -178,6 +198,7 @@
   <ItemGroup>
     <Folder Include="App_Data\Images\" />
     <Folder Include="Images\ResidentImages\" />
+    <Folder Include="PDFS\Outputs\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Code\AuditLogHelper.cs" />
@@ -215,6 +236,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="BIMSDb.cs" />
+    <Compile Include="Controllers\BlotterController.cs" />
     <Compile Include="Controllers\BusinessController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DispenseController.cs" />
@@ -231,16 +253,19 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201902241744431_Initialize.cs" />
-    <Compile Include="Migrations\201902241744431_Initialize.Designer.cs">
-      <DependentUpon>201902241744431_Initialize.cs</DependentUpon>
+    <Compile Include="Migrations\201903162043140_Initialize.cs" />
+    <Compile Include="Migrations\201903162043140_Initialize.Designer.cs">
+      <DependentUpon>201903162043140_Initialize.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\BarangayClearanceTransaction.cs" />
     <Compile Include="Models\BaseEntity.cs" />
     <Compile Include="Models\BimsContext.cs" />
+    <Compile Include="Models\Blotter.cs" />
     <Compile Include="Models\Business.cs" />
     <Compile Include="Models\BusinessClearance.cs" />
+    <Compile Include="Models\Complainant.cs" />
+    <Compile Include="Models\Accused.cs" />
     <Compile Include="Models\DispenseTransaction.cs" />
     <Compile Include="Models\IndigencyTransaction.cs" />
     <Compile Include="Models\InventoryMovement.cs" />
@@ -263,6 +288,7 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="PDFS\Templates\BusinessClearance\BusinessClearance.html" />
     <Content Include="Scripts\ai.0.22.9-build00167.js" />
     <Content Include="Scripts\ai.0.22.9-build00167.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -289,6 +315,8 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="PDFS\Templates\BusinessClearance\BusinessClearance.docx" />
+    <None Include="Properties\PublishProfiles\TestProfile.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -322,8 +350,8 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201902241744431_Initialize.resx">
-      <DependentUpon>201902241744431_Initialize.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201903162043140_Initialize.resx">
+      <DependentUpon>201903162043140_Initialize.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
