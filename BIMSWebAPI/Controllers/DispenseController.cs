@@ -194,5 +194,126 @@ namespace BIMSWebAPI.Controllers
             public int Quantity { get; set; }
         }
 
+
+        //[AllowAnonymous]
+        [Route("api/Dispense/NewDispenseTransaction")]
+        [HttpPost]
+        public async Task<IHttpActionResult> NewDispenseTransaction(DispenseTransaction model)
+        {
+            using (var context = new BimsContext())
+            {
+                var resident = context.Residents.Find(model.ResidentID);
+                DispenseTransaction dispense = new DispenseTransaction { Resident = resident, ResidentID = resident.ID, CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy, Prescriptive = model.Prescriptive };
+                context.DispenseTransactions.Add(dispense);
+                foreach (InventoryMovement itm in model.InventoryMovement)
+                {
+                    int qty = -1 * itm.Quantity;
+                    var stock = context.Stocks.Find(itm.StockID);
+                    InventoryMovement im = new InventoryMovement { CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy, StockID = itm.StockID, Quantity = qty, DispenseTransaction = dispense, Stock = stock, Days = itm.Days, Intakes = itm.Intakes };
+                    context.InventoryMovement.Add(im);
+                    //dispense.InventoryMovement.Add(im);
+                }
+                context.SaveChanges();
+            }
+            return Ok(new ResponseModel()
+            {
+                status = ResponseStatus.Success,
+                message = "Successfully Added"
+            });
+        }
+
+        //[AllowAnonymous]
+        [Route("api/Dispense/ListDispenseTransactionV2/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ListDispenseTransactionV2(int id)
+        {
+            using (var context = new BimsContext())
+            {
+                var resident = context.Residents.Find(id);
+                if (resident == null)
+                {
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Fail,
+                        message = "No User Found"
+                    });
+                }
+                else
+                {
+                    var dispenseTransactions = (from finalDt in (from im in context.InventoryMovement
+                                                                 join dt in context.DispenseTransactions on im.DispenseTransactionID equals dt.ID
+                                                                 group im by im.DispenseTransaction into g
+                                                                 select new
+                                                                 {
+                                                                     ID = g.Key.ID,
+                                                                     DateDispensed = g.Key.DateCreated,
+                                                                     UserID = g.Key.CreatedBy,
+                                                                     Prescriptive = g.Key.Prescriptive
+                                                                 })
+                                                join finalUser in context.Users on finalDt.UserID equals finalUser.ID
+                                                select new
+                                                {
+                                                    DateDispensed = finalDt.DateDispensed,
+                                                    CreatedBy = finalUser.FirstName + " " + finalUser.MiddleName + " " + finalUser.LastName,
+                                                    Prescriptive = finalDt.Prescriptive == 1 ? "Yes" : "No",
+                                                    ID = finalDt.ID,
+                                                    Prescriptions = ""
+                                                }).ToList();
+
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Success,
+                        message = "Successfully Fetched",
+                        data = dispenseTransactions
+                    });
+                }
+            }
+        }
+
+
+        //[AllowAnonymous]
+        [Route("api/Dispense/ListDispenseMedicinesV2/{id}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> ListDispenseMedicinesV2(int id)
+        {
+            using (var context = new BimsContext())
+            {
+                var dispenseTransaction = await context.DispenseTransactions.FindAsync(id);
+                if (dispenseTransaction == null)
+                {
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Fail,
+                        message = "No Dispense Transaction Found"
+                    });
+                }
+                else
+                {
+                    //Get All Dispense Transaction Medicines
+                    var dispenseTransactions = (from im in context.InventoryMovement
+                                                join dt in context.DispenseTransactions on im.DispenseTransactionID equals dt.ID
+                                                join s in context.Stocks on im.StockID equals s.ID
+                                                join m in context.Medicines on s.MedicineID equals m.ID
+                                                where im.DispenseTransactionID == id
+                                                select new
+                                                {
+                                                    ID = im.ID,
+                                                    Medicine = m.MedicineName,
+                                                    Description = m.Description,
+                                                    ExpirationDate = s.ExpirationDate,
+                                                    Quantity = im.Quantity * -1,
+                                                    Intakes = im.Intakes,
+                                                    Days = im.Days
+                                                }).ToList();
+                    return Ok(new ResponseModel()
+                    {
+                        status = ResponseStatus.Success,
+                        message = "Successfully Fetched",
+                        data = dispenseTransactions
+                    });
+                }
+            }
+        }
+
     }
 }

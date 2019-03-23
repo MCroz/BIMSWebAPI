@@ -69,9 +69,18 @@ namespace BIMSWebAPI.Controllers
 
                         string filename = "BCC_" + DateTime.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
                         Dictionary<string, string> myReplacements = new Dictionary<string, string>();
-                        myReplacements.Add("{{FullName}}", resident.FirstName + ' ' + resident.MiddleName + ' ' + resident.LastName);
+
+                        myReplacements.Add("{{FullName}}", bc.FullName);
+                        myReplacements.Add("{{Date}}", DateTime.Now.ToString("dddd, dd MMMM yyyy"));
+                        myReplacements.Add("{{Address}}", bc.FullAddress);
+                        myReplacements.Add("{{Purpose}}", bc.Purpose);
+                        myReplacements.Add("{{ControlNo}}", bc.ControlNo);
+
+
                         Image image = Image.FromFile(HttpContext.Current.Server.MapPath("~/Images/ResidentImages/" + resident.Image));
                         string templatePath = "~/PDFS/Templates/BarangayClearance.docx";
+
+
                         string newFilename = GeneratePDF(templatePath, myReplacements, image, filename, 153.6f, 150.72f);
 
                         return Ok(new ResponseModel()
@@ -105,7 +114,14 @@ namespace BIMSWebAPI.Controllers
 
                         string filename = "IC_" + DateTime.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
                         Dictionary<string, string> myReplacements = new Dictionary<string, string>();
-                        myReplacements.Add("{{FullName}}", resident.FirstName + ' ' + resident.MiddleName + ' ' + resident.LastName);
+
+                        myReplacements.Add("{{FullName}}", it.FullName);
+                        myReplacements.Add("{{Date}}", DateTime.Now.ToString("dddd, dd MMMM yyyy"));
+                        myReplacements.Add("{{Address}}", it.FullAddress);
+                        myReplacements.Add("{{Purpose}}", it.Purpose);
+                        myReplacements.Add("{{ControlNo}}", it.ControlNo);
+
+
                         Image image = Image.FromFile(HttpContext.Current.Server.MapPath("~/Images/ResidentImages/" + resident.Image));
                         string templatePath = "~/PDFS/Templates/Indigency.docx";
                         string newFilename = GeneratePDF(templatePath, myReplacements, image, filename, 153.6f, 150.72f);

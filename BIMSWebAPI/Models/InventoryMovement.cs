@@ -14,6 +14,9 @@ namespace BIMSWebAPI.Models
 
         public int Quantity { get; set; }
 
+        public int? Days { get; set; }
+        public int? Intakes { get; set; }
+
         public int? DispenseTransactionID { get; set; }
         public DispenseTransaction DispenseTransaction { get; set; }
     }

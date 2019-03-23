@@ -11,6 +11,8 @@ namespace BIMSWebAPI.Models
 
         public int ResidentID { get; set; }
         public Resident Resident { get; set; }
+
+        public int Prescriptive { get; set; }
         
         public string PrescriptionDescription { get; set; }
 

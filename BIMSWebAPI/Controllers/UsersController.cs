@@ -337,12 +337,14 @@ namespace BIMSWebAPI.Controllers
                     message = "Successfully Updated.";
                     resp = ResponseStatus.Success;
                 }
+                return Ok(new ResponseModel()
+                {
+                    status = resp,
+                    message = message,
+                    data = user
+                });
             }
-            return Ok(new ResponseModel()
-            {
-                status = resp,
-                message = message
-            });
+
         }
 
 

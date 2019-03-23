@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 
 namespace BIMSWebAPI.Controllers
@@ -40,11 +42,6 @@ namespace BIMSWebAPI.Controllers
                 }
                 if (rm.ReportType == "Dispense Report")
                 {
-                    //var Report = context.DispenseTransactions.Where(d => d.DateCreated >= startDate && d.DateCreated < endDate).GroupJoin(context.InventoryMovement, DTransaction => DTransaction.ID, IMovement => IMovement.DispenseTransactionID, (x, y) => new { DispenseTransaction = x, InventoryMovements = y })
-                    //    .SelectMany(
-                    //        xy => xy.InventoryMovements.DefaultIfEmpty(),
-                    //        (x, y) => new { DispenseTransaction = x, InventoryMovement = y }
-                    //    ).Select(s => s).ToList();
 
                     var Report = (from finalDt in (from im in context.InventoryMovement
                                                    join dt in context.DispenseTransactions on im.DispenseTransactionID equals dt.ID
@@ -59,7 +56,7 @@ namespace BIMSWebAPI.Controllers
                                                        DateDispensed = g.Key.DateCreated,
                                                        UserID = g.Key.CreatedBy,
                                                        PrescriptionDescription = g.Key.PrescriptionDescription,
-                                                       DispensedMedicines = g.Key.InventoryMovement.Select(me => new { MedicineName = me.Stock.Medicine.MedicineName, MedicineDescription = me.Stock.Medicine.Description, Quantity = me.Quantity * -1 }).ToList()
+                                                       DispensedMedicines = g.Key.InventoryMovement.Select(me => new { Intakes = me.Intakes, Days = me.Days ,MedicineName = me.Stock.Medicine.MedicineName, MedicineDescription = me.Stock.Medicine.Description, Quantity = me.Quantity * -1 }).ToList()
                                                    }
                                   )
                                   join finalUser in context.Users on finalDt.UserID equals finalUser.ID
@@ -72,11 +69,80 @@ namespace BIMSWebAPI.Controllers
                                       DispensedMedicines = finalDt.DispensedMedicines
                                   }).ToList();
 
+
+                    
+
+                    
+                    string templatePath = "~/PDFS/Templates/Report.html";
+                    string htmlTemplate = File.ReadAllText(HttpContext.Current.Server.MapPath(templatePath));
+                    
+
+                    string html = "";
+                    html += "<table class='alt'>";
+                    html += "<thead><tr>";
+                    html += "<td>Date Dispensed</td>";
+                    html += "<td>Resident</td>";
+                    html += "<td>Dispensed By</td>";
+                    html += "<td>Prescription Description</td>";
+                    html += "<td>Medicines</td>";
+                    html += "</tr></thead>";
+                    html += "<tbody>";
+
+
+
+                    if (Report.Count() > 0)
+                    {
+                        foreach (var rep in Report)
+                        {
+                            html += "<tr>";
+                            html += "<td>" +  Convert.ToDateTime(rep.DateDispensed).ToString("dddd, dd MMMM yyyy") + "</td>";
+                            html += "<td>" + rep.Resident + "</td>";
+                            html += "<td>" + rep.User + "</td>";
+                            html += "<td>";
+
+                            foreach (var medicineData in rep.DispensedMedicines)
+                            {
+                                var days = medicineData.Days;
+                                var intake = medicineData.Intakes;
+                                string blankPresc;
+                                if (days != null)
+                                {
+                                    var dayStr = days > 1 ? " days" : " day";
+                                    html += "" + intake + "x a day, for " + days + dayStr + "<br>";
+                                }
+                            }
+
+                            html += "</td>";
+                            html += "<td>";
+                            
+                            foreach (var medicineData in rep.DispensedMedicines)
+                            {
+                                html += medicineData.MedicineName + " - " + medicineData.Quantity + "<br>";
+                            }
+
+
+                            html += "</td>";
+                            html += "</tr>";
+                        }
+                    }
+                    html += "</tbody>";
+                    html += "</table>";
+
+                    string updatedStr = htmlTemplate.Replace("{{Report}}", html);
+
+                    var Renderer = new IronPdf.HtmlToPdf();
+                    //var PDF = Renderer.RenderHTMLFileAsPdf(htmlTemplate);
+                    var PDF = Renderer.RenderHtmlAsPdf(updatedStr);
+                    
+
+                    var OutputPath = "~/PDFS/Outputs/Report.pdf";
+                    PDF.SaveAs(HttpContext.Current.Server.MapPath(OutputPath));
+
                     return Ok(new ResponseModel()
                     {
                         status = ResponseStatus.Success,
                         message = "Successfully Fetched",
-                        data = Report
+                        data = "Report.pdf"
                     });
                 }
 
