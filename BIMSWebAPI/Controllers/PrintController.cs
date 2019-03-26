@@ -41,6 +41,17 @@ namespace BIMSWebAPI.Controllers
                 }
                 else
                 {
+                    //Check if the resident has a blotter
+                    var blotter = context.Blotters.Where( b => b.AccusedID == resident.ID && b.Status != "Settled Case").ToList();
+                    if (blotter.Count > 0) {
+                        return Ok(new ResponseModel()
+                        {
+                            status = ResponseStatus.Fail,
+                            message = "Resident has Existing Blotter."
+                        });
+                    }
+
+
                     //Create a new Transaction
                     //Fetch who Create it
                     var processingUser = context.Users.Find(printModel.ProcessedByID);

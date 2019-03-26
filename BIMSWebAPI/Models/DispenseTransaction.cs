@@ -16,6 +16,9 @@ namespace BIMSWebAPI.Models
         
         public string PrescriptionDescription { get; set; }
 
+        public string DoctorName { get; set; }
+        public string DoctorLicenseNo { get; set; }
+
         public IList<InventoryMovement> InventoryMovement { get; set; }
     }
 }

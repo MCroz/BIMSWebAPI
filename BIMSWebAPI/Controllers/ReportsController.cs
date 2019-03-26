@@ -56,7 +56,9 @@ namespace BIMSWebAPI.Controllers
                                                        DateDispensed = g.Key.DateCreated,
                                                        UserID = g.Key.CreatedBy,
                                                        PrescriptionDescription = g.Key.PrescriptionDescription,
-                                                       DispensedMedicines = g.Key.InventoryMovement.Select(me => new { Intakes = me.Intakes, Days = me.Days ,MedicineName = me.Stock.Medicine.MedicineName, MedicineDescription = me.Stock.Medicine.Description, Quantity = me.Quantity * -1 }).ToList()
+                                                       DispensedMedicines = g.Key.InventoryMovement.Select(me => new { Intakes = me.Intakes, Days = me.Days ,MedicineName = me.Stock.Medicine.MedicineName, MedicineDescription = me.Stock.Medicine.Description, Quantity = me.Quantity * -1 }).ToList(),
+                                                       DoctorName = g.Key.DoctorName,
+                                                       DoctorLicenseNo = g.Key.DoctorLicenseNo
                                                    }
                                   )
                                   join finalUser in context.Users on finalDt.UserID equals finalUser.ID
@@ -66,7 +68,9 @@ namespace BIMSWebAPI.Controllers
                                       DateDispensed = finalDt.DateDispensed,
                                       User = finalUser.FirstName + " " + finalUser.MiddleName + " " + finalUser.LastName,
                                       PrescriptionDescription = finalDt.PrescriptionDescription,
-                                      DispensedMedicines = finalDt.DispensedMedicines
+                                      DispensedMedicines = finalDt.DispensedMedicines,
+                                      DoctorName = finalDt.DoctorName,
+                                      DoctorLicenseNo = finalDt.DoctorLicenseNo
                                   }).ToList();
 
 
@@ -85,6 +89,8 @@ namespace BIMSWebAPI.Controllers
                     html += "<td>Dispensed By</td>";
                     html += "<td>Prescription Description</td>";
                     html += "<td>Medicines</td>";
+                    html += "<td>Doctor Name</td>";
+                    html += "<td>License No.</td>";
                     html += "</tr></thead>";
                     html += "<tbody>";
 
@@ -122,6 +128,9 @@ namespace BIMSWebAPI.Controllers
 
 
                             html += "</td>";
+
+                            html += "<td>" + rep.DoctorName + "</td>";
+                            html += "<td>" + rep.DoctorLicenseNo + "</td>";
                             html += "</tr>";
                         }
                     }

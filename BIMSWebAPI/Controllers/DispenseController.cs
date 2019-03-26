@@ -54,7 +54,7 @@ namespace BIMSWebAPI.Controllers
             using (var context = new BimsContext())
             {
                 var resident = context.Residents.Find(model.ResidentID);
-                DispenseTransaction dispense = new DispenseTransaction { Resident = resident, ResidentID = resident.ID, PrescriptionDescription = model.PrescriptionDescription, CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy };
+                DispenseTransaction dispense = new DispenseTransaction { Resident = resident, ResidentID = resident.ID, PrescriptionDescription = model.PrescriptionDescription, CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy, DoctorName = model.DoctorName, DoctorLicenseNo = model.DoctorLicenseNo };
                 context.DispenseTransactions.Add(dispense);
                 foreach (CustomDispenseMedicineItem itm in model.Items)
                 {
@@ -187,6 +187,8 @@ namespace BIMSWebAPI.Controllers
             public string PrescriptionDescription { get; set; }
             public int CreatedBy { get; set; }
             public int ModifiedBy { get; set; }
+            public string DoctorName { get; set; }
+            public string DoctorLicenseNo { get; set; }
         }
 
         public class CustomDispenseMedicineItem {
@@ -203,7 +205,7 @@ namespace BIMSWebAPI.Controllers
             using (var context = new BimsContext())
             {
                 var resident = context.Residents.Find(model.ResidentID);
-                DispenseTransaction dispense = new DispenseTransaction { Resident = resident, ResidentID = resident.ID, CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy, Prescriptive = model.Prescriptive };
+                DispenseTransaction dispense = new DispenseTransaction { Resident = resident, ResidentID = resident.ID, CreatedBy = model.CreatedBy, ModifiedBy = model.ModifiedBy, Prescriptive = model.Prescriptive, DoctorName = model.DoctorName, DoctorLicenseNo = model.DoctorLicenseNo };
                 context.DispenseTransactions.Add(dispense);
                 foreach (InventoryMovement itm in model.InventoryMovement)
                 {
@@ -248,7 +250,9 @@ namespace BIMSWebAPI.Controllers
                                                                      ID = g.Key.ID,
                                                                      DateDispensed = g.Key.DateCreated,
                                                                      UserID = g.Key.CreatedBy,
-                                                                     Prescriptive = g.Key.Prescriptive
+                                                                     Prescriptive = g.Key.Prescriptive,
+                                                                     DoctorName = g.Key.DoctorName,
+                                                                     DoctorLicenseNo = g.Key.DoctorLicenseNo
                                                                  })
                                                 join finalUser in context.Users on finalDt.UserID equals finalUser.ID
                                                 select new
@@ -257,7 +261,9 @@ namespace BIMSWebAPI.Controllers
                                                     CreatedBy = finalUser.FirstName + " " + finalUser.MiddleName + " " + finalUser.LastName,
                                                     Prescriptive = finalDt.Prescriptive == 1 ? "Yes" : "No",
                                                     ID = finalDt.ID,
-                                                    Prescriptions = ""
+                                                    Prescriptions = "",
+                                                    DoctorName = finalDt.DoctorName,
+                                                    DoctorLicenseNo = finalDt.DoctorLicenseNo
                                                 }).ToList();
 
                     return Ok(new ResponseModel()
